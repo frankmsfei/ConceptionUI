@@ -1,0 +1,14 @@
+## Title: |TInterface/CURSOR/Attack:12|t |cFFCCCCCCC|cFFAAAAAAUI|r - DataBroker
+## Notes: |cFFCCCCCCConception|cFFAAAAAAUI|cFF00619E DataBroker Plugins in CargoShip|r
+## Author: 斬擊#3331
+## Version: JAN '14
+## Interface: 50100
+## SavedVariables: ConceptionDB
+## SavedVariablesPerCharacter: ConceptionDBC
+
+libs\LibStub.lua
+libs\CallbackHandler-1.0.lua
+libs\LibDataBroker-1.1.lua
+libs\LibCargoShip-2.1.lua
+libs\Timer.lua
+loadup.xml

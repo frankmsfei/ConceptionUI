@@ -1,0 +1,10 @@
+<ui>
+<script file='module\QuickClick.lua'/>
+<script file='module\NetStats.lua'/>
+<script file='module\Graphics.lua'/>
+<script file='module\Memory.lua'/>
+<script file='module\Spec.lua'/>
+<script file='module\Equipment.lua'/>
+<script file='module\Durability.lua'/>
+<script file='layout.lua'/>
+</ui>
