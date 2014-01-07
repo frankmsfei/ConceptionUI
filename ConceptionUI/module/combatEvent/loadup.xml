@@ -1,0 +1,6 @@
+<ui>
+<script file='combatEvent.lua'/>
+<script file='cleu.lua'/>
+<script file='class\common.lua'/>
+<script file='class\paladin.lua'/>
+</ui>

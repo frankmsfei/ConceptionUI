@@ -1,0 +1,4 @@
+<ui>
+<script file = 'miniMap.lua'/>
+<script file = 'worldMap.lua'/>
+</ui>

@@ -1,0 +1,1 @@
+<ui><script file='core.lua'/><script file='media.lua'/><script file='api.lua'/><script file='initial.lua'/><script file='command.lua'/><script file='global.lua'/></ui>

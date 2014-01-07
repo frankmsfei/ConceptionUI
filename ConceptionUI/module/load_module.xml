@@ -1,0 +1,1 @@
+<ui><script  file = 'vignetting\vignetting.lua'/><include file = 'unitFrame\loadup.xml'/><include file = 'unitAura\loadup.xml'/><include file = 'combatEvent\loadup.xml'/><include file = 'namePlate\loadup.xml'/><include file = 'actionBar\loadup.xml'/><include file = 'map\loadup.xml'/><include file = 'tip\loadup.xml'/><include file = 'plugin\loadup.xml'/></ui>

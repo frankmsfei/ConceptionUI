@@ -1,0 +1,1 @@
+<ui><include file = 'core\load_core.xml'/><script  file = 'config.lua'/><include file = 'module\load_module.xml'/></ui>
