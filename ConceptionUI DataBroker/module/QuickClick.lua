@@ -9,7 +9,7 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 				return
 			elseif alt then
 				if not awp then return end
-				SlashCmdList.AWP('load Rading')
+				SlashCmdList.AWP('load Basic')
 				return
 			else
 				SetCVar('Sound_EnableSFX', 1 - GetCVar('Sound_EnableSFX'))
@@ -21,7 +21,7 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 				return
 			elseif alt then
 				if not awp then return end
-				SlashCmdList.AWP('load Pet Battle')
+				SlashCmdList.AWP('load Raid')
 				return
 			else
 				if not MacroFrame then
@@ -33,14 +33,7 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 				end
 			end
 		elseif button == 'MiddleButton' then
-			if alt then
-				if not awp then return end
-				SlashCmdList.AWP('load Basic')
-				return
-			else
-				ToggleMinimap()
-				return
-			end
+			return ToggleMinimap()
 		end
 	end,
  	OnTooltipShow = function(tip)
@@ -57,9 +50,8 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 		tip:AddDoubleLine('Toggle Minimap', '[M]', .38, .38, .38, .19, .62, .19)
 		if IsAddOnLoaded('!AWP') then
 			tip:AddLine('\nAddOn Profiles', .62, .62, 0)
-			tip:AddDoubleLine('Rading', 'ALT+[L]', .38, .38, .38, .62, .38, 0)
-			tip:AddDoubleLine('Pet Battle', 'ALT+[R]', .38, .38, .38, 0, .38, .62)
-			tip:AddDoubleLine('Basic', 'ALT+[M]', .38, .38, .38, .19, .62, .19)
+			tip:AddDoubleLine('Basic', 'ALT+[L]', .38, .38, .38, .62, .38, 0)
+			tip:AddDoubleLine('Raid', 'ALT+[R]', .38, .38, .38, 0, .38, .62)
 		end
 		tip:AddLine('\nNameplates', .62, .62, 0)
 		tip:AddDoubleLine('Friendly Nameplates', 'SHIFT+[L]', .38, .38, .38, .62, .38, 0)

@@ -6,5 +6,6 @@
 <script file='module\Spec.lua'/>
 <script file='module\Equipment.lua'/>
 <script file='module\Durability.lua'/>
+<script file='module\CombatLogger.lua'/>
 <script file='layout.lua'/>
 </ui>

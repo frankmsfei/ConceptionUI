@@ -61,9 +61,9 @@ function Equip:PLAYER_LOGIN(event)
 end
 
 function Equip:PLAYER_REGEN_ENABLED(event)
+	MENU:UnregisterEvent(event)
 	EquipmentManager_EquipSet(self.pending)
 	self.pending = nil
-	MENU:UnregisterEvent(event)
 end
 
 function Equip.OnEnter(self)
