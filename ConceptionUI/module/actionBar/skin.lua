@@ -15,7 +15,7 @@ hooksecurefunc('ActionButton_UpdateUsable', FixTexture)
 
 local function Skin(self)
 	local name = self:GetName()
-	if name:find('OverrideActionBarButton') then
+	if name:match('OverrideActionBarButton%d') then
 		return
 	end
 
@@ -122,7 +122,7 @@ local function Skin(self)
 	end
  end
 hooksecurefunc('ActionButton_Update', Skin)
-
+--hooksecurefunc('PetActionBar_Update', Skin)
 
 local function UpdateHotkeys(self, actionButtonType)
 	local hotkey = _G[self:GetName()..'HotKey']

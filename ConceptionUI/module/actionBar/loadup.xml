@@ -3,5 +3,6 @@
 <script file = 'mainBar.lua'/>
 <script file = 'rightBar.lua'/>
 <script file = 'leftBar.lua'/>
+<script file = 'petBar.lua'/>
 <script file = 'skin.lua'/>
 </ui>

@@ -2,6 +2,17 @@ local CombatLogger = LibStub("LibDataBroker-1.1"):NewDataObject("CombatLogger", 
 
 local IsInInstance, GetCurrentMapAreaID, LoggingCombat = IsInInstance, GetCurrentMapAreaID, LoggingCombat
 
+function CombatLogger:OnClick(button)
+	local logging = LoggingCombat()
+	if logging then
+		LoggingCombat(false)
+		CombatLogger.text = ('|cFF616161LOG:%s'):format('|cFF9E0000OFF|r')
+	else
+		LoggingCombat(true)
+		CombatLogger.text = ('|cFF616161LOG:%s'):format('|cFF009E00ON|r')
+	end
+end
+
 function CombatLogger:Update()
 	local status = false
 	if IsInInstance() then

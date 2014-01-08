@@ -10,8 +10,8 @@ local HIDE_LIST = {
 	--OverrideActionBarPowerBar,
 	--OverrideActionBarPitchFrame,
 	--OverrideActionBarLeaveFrameLeaveButton,
-	BonusActionBarFrame, 
-	PossessBarFrame,
+	--BonusActionBarFrame, 
+	--PossessBarFrame,
 	MainMenuBarBackpackButton,
 	CharacterBag0Slot,
 	CharacterBag1Slot,
@@ -35,7 +35,7 @@ local HIDE_LIST = {
 }
 
 local hide = CreateFrame('Frame')
-	hide:Hide()
+hide:Hide()
 
 for _, v in pairs(HIDE_LIST) do
 	if v:GetObjectType() == 'Texture' then

@@ -14,4 +14,4 @@ local leftBar = CreateFrame('Frame', nil, C, 'SecureHandlerStateTemplate')
 	end
 
 MultiBarLeft:SetParent(leftBar)
-MultiBarLeft:EnableMouse(false)
+--MultiBarLeft:EnableMouse(false)
