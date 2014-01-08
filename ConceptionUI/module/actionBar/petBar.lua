@@ -1,4 +1,4 @@
-local petBar = CreateFrame('Frame', nil, C, 'SecureHandlerStateTemplate')
+local petBar = CreateFrame('Frame', nil, ConceptionCORE)
 	petBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -80, -270)
 	petBar:SetSize(25.6, 25.6*12+6*11)
 
@@ -12,3 +12,14 @@ local petBar = CreateFrame('Frame', nil, C, 'SecureHandlerStateTemplate')
 			button:SetPoint('TOP', _G['PetActionButton'..i-1], 'BOTTOM', 0, -6)
 		end
 	end
+
+local function Skin(self)
+	if self.skin then
+		return
+	end
+	self.skin = true
+
+	self:SetSize(25.6, 25.6)
+end
+
+--hooksecurefunc('PetActionBar_Update', Skin)

@@ -1,7 +1,4 @@
-local C = select(2,...)[1]
-local dummy = select(2,...)[2].API.dummy
-
-local mainBar = CreateFrame('Frame', nil, C, 'SecureHandlerStateTemplate')
+local mainBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTemplate')
 	mainBar:SetPoint('TOP', UIParent, 'CENTER', 0, -210)
 	mainBar:SetSize(25.6*6+5*6, 25.6*2+6)
 

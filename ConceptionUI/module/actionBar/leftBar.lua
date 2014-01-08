@@ -1,5 +1,4 @@
-local C = select(2,...)[1]
-local leftBar = CreateFrame('Frame', nil, C, 'SecureHandlerStateTemplate')
+local leftBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTemplate')
 	leftBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -42, -270)
 	leftBar:SetSize(25.6, 25.6*12+6*11)
 

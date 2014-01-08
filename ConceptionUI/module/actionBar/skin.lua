@@ -122,7 +122,6 @@ local function Skin(self)
 	end
  end
 hooksecurefunc('ActionButton_Update', Skin)
---hooksecurefunc('PetActionBar_Update', Skin)
 
 local function UpdateHotkeys(self, actionButtonType)
 	local hotkey = _G[self:GetName()..'HotKey']
