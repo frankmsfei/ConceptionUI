@@ -4,7 +4,7 @@ function D.LOAD.P:Initial()
 	local cfg, api = D.CFG['OTHERS'], D.API
 
 	-- Spell Activation Overlay
-	--SpellActivationOverlayFrame:SetScale(api.scale(1))
+	SpellActivationOverlayFrame:SetScale(api.scale(1))
 
 	-- RaidBossEmoteFrame
 	RaidBossEmoteFrame:ClearAllPoints()
