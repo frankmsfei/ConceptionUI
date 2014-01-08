@@ -11,11 +11,11 @@ function D.LOAD.M:SkinMinimap()
 
 	MinimapBackdrop:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', -5, 5)
 	MinimapBackdrop:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 5, -5)
-	MinimapBackdrop:SetBackdrop({edgeFile=[[Interface\AddOns\ConceptionUI\media\texture\backdropShadow]], edgeSize=5, insets={left=5,right=5,top=5,bottom=5}})
+	MinimapBackdrop:SetBackdrop(D.MEDIA.TEXTURE.dropshadow)
 	MinimapBackdrop:SetBackdropBorderColor(0, 0, 0, .6)
-	MinimapBackdrop:RegisterEvent("CALENDAR_UPDATE_PENDING_INVITES")
-	MinimapBackdrop:RegisterEvent("CALENDAR_ACTION_PENDING")
-	MinimapBackdrop:SetScript("OnEvent", function(self, event)
+	MinimapBackdrop:RegisterEvent('CALENDAR_UPDATE_PENDING_INVITES')
+	MinimapBackdrop:RegisterEvent('CALENDAR_ACTION_PENDING')
+	MinimapBackdrop:SetScript('OnEvent', function(self, event)
 		if event == 'CALENDAR_UPDATE_PENDING_INVITES' then
 			self:SetBackdropBorderColor(.618, .618, 0, .6)
 		elseif event == 'CALENDAR_ACTION_PENDING' then
@@ -26,25 +26,17 @@ function D.LOAD.M:SkinMinimap()
 	Minimap.Overlay = Minimap:CreateTexture(nil, 'BORDER')
 	Minimap.Overlay:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', 0, 0)
 	Minimap.Overlay:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 0, 0)
-	Minimap.Overlay:SetTexture([[Interface\AddOns\ConceptionUI\media\texture\buttonOverlay]])
+	Minimap.Overlay:SetTexture(D.MEDIA.TEXTURE.buttonOverlay)
 	Minimap.Overlay:SetVertexColor(0, 0, 0, 1)
 
-	--Minimap.ZoneIcon = Minimap:CreateTexture(nil, 'OVERLAY')
-	--Minimap.ZoneIcon:SetTexture([[Interface\AddOns\ConceptionUI\media\texture\arrowL]])
-	--Minimap.ZoneIcon:SetPoint('BOTTOMRIGHT', Minimap, 'TOPRIGHT', 7, 1)
-
 	MiniMapInstanceDifficulty:ClearAllPoints()
-	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
-	--MiniMapInstanceDifficulty:SetScale(.8)
+	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
 
 	MiniMapChallengeMode:ClearAllPoints()
-	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
-	--MiniMapChallengeMode:SetScale(.8)
+	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
 
 	GuildInstanceDifficulty:ClearAllPoints()
-	GuildInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
-	--GuildInstanceDifficulty:SetScale(.8)
-	--SetSmallGuildTabardTextures("player", GuildInstanceDifficulty.emblem, GuildInstanceDifficulty.background, GuildInstanceDifficulty.border)
+	GuildInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
 
 	MiniMapMailFrame:ClearAllPoints()
 	MiniMapMailFrame:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 7, -7)
@@ -54,6 +46,7 @@ function D.LOAD.M:SkinMinimap()
 	QueueStatusMinimapButton:ClearAllPoints()
 	QueueStatusMinimapButton:SetPoint('BOTTOMLEFT', Minimap, -7, -7)
 	QueueStatusMinimapButton:Show()
+
 	MiniMapRecordingButton:ClearAllPoints()
 	MiniMapRecordingButton:SetPoint('BOTTOMLEFT', Minimap, -7, 7)
 	
@@ -68,61 +61,27 @@ function D.LOAD.M:SkinMinimap()
 
 	MinimapCluster:RegisterEvent('PLAYER_ENTERING_WORLD')
 	MinimapCluster:HookScript('OnEvent', function()
+		SetMapToCurrentZone()
 		local r, g, b = MinimapZoneText:GetTextColor()
 		MinimapZoneText:SetTextColor(.618*r, .618*g, .618*b)
 		local subzone, realzone = GetSubZoneText(), GetRealZoneText()
 		if subzone ~= '' and subzone ~= realzone then
-			MinimapZoneText:SetFormattedText('%s-%s', subzone, realzone)
+			MinimapZoneText:SetFormattedText('%s/%s', subzone, realzone)
 			return
 		else
 			MinimapZoneText:SetText(realzone)
 		end
+		if not MiniMapInstanceDifficulty:IsShown() and not MiniMapChallengeMode:IsShown() and not GuildInstanceDifficulty:IsShown() then
+			SetSmallGuildTabardTextures('player', GuildInstanceDifficulty.emblem, GuildInstanceDifficulty.background, GuildInstanceDifficulty.border)
+			GuildInstanceDifficultyHeroicTexture:Hide()
+			GuildInstanceDifficultyChallengeModeTexture:Hide()
+			GuildInstanceDifficultyText:SetText()
+			GuildInstanceDifficulty:Show()
+		end
 	end)
 
-	--[[hooksecurefunc('Minimap_Update', function()
-		local r, g, b = MinimapZoneText:GetTextColor()
-		
-		MinimapZoneText:
-		print(GetSubZoneText(), GetRealZoneText())
-	end)]]
---[[
-function Minimap_Update()
-	MinimapZoneText:SetFormattedText('%s - %s', GetSubZoneText(), GetRealZoneText())
 
-	local r, g, b = NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b
-	local pvpType, isSubZonePvP, factionName = GetZonePVPInfo()
-	if ( pvpType == "sanctuary" ) then
-		r, g, b = 0.41, 0.8, 0.94
-	elseif ( pvpType == "arena" ) then
-		r, g, b = 1.0, 0.1, 0.1
-	elseif ( pvpType == "friendly" ) then
-		r, g, b = 0.1, 1.0, 0.1
-	elseif ( pvpType == "hostile" ) then
-		r, g, b = 1.0, 0.1, 0.1
-	elseif ( pvpType == "contested" ) then
-		r, g, b = 1.0, 0.7, 0.0
-	end
-	MinimapZoneText:SetTextColor(.618*r, .618*g, .618*b)
-
-	Minimap_SetTooltip(pvpType, factionName)
-end
-
-
-	MinimapCluster:HookScript('OnEvent', function(self, event)
-		print(event)
-	--	local r, g, b = MinimapZoneText:GetTextColor()
-	--	MinimapZoneText:SetTextColor(.618*r, .618*g, .618*b)
-	--	if not MiniMapInstanceDifficulty:IsShown() and not MiniMapChallengeMode:IsShown() and not GuildInstanceDifficulty:IsShown() then
-	--		GuildInstanceDifficultyHeroicTexture:Hide()
-	--		GuildInstanceDifficultyChallengeModeTexture:Hide()
-	--		GuildInstanceDifficultyText:SetText()
-	--		GuildInstanceDifficulty:Show()
-	--	end
-	end)
-]]
-	
-
-	do -- Hide Timer
+	do -- Hide Obj
 		LoadAddOn('Blizzard_TimeManager')
 		TimeManagerClockButton:Hide()
 		MinimapNorthTag:SetAlpha(0)
@@ -144,9 +103,7 @@ end
 	local function OnMouseUp(self, button)
 		if button == 'RightButton' then
 			ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, self, 0, 0)
-		elseif button == 'MiddleButton' then
-			ToggleCalendar()
-		else
+		elseif button == 'LefttButton' then
 			Minimap_OnClick(self)
 		end
 	end
