@@ -1,15 +1,16 @@
 local TEXTURE = select(2,...)[2].MEDIA.TEXTURE
 
 local function Skin(self)
-	local name = self:GetName()
-	if name:match('OverrideActionBarButton%d') then
-		return
-	end
-
 	if self.skin then
 		return
 	end
 	self.skin = true
+
+	local name = self:GetName()
+
+	if name:match('^Override%w+%d$') or name:match('^Extra%w+%d$') then
+		return
+	end
 
 	self:SetSize(26, 26)
 
@@ -95,10 +96,12 @@ local function Skin(self)
 	if flyoutBorder then
 		flyoutBorder:SetTexture(nil)
 	end
+
 	local flyoutBorderShadow = self.FlyoutBorderShadow
 	if flyoutBorderShadow then
 		flyoutBorderShadow:SetTexture(nil)
 	end
+
 	--local flyoutArrow = self.FlyoutArrow
 
 	if not self.shadowFrame then
@@ -124,17 +127,26 @@ local function Skin(self)
 hooksecurefunc('ActionButton_Update', Skin)
 hooksecurefunc('PetActionButton_OnEvent', Skin)
 
-local IsEquippedAction = IsEquippedAction
+local IsEquippedAction, IsConsumableAction = IsEquippedAction, IsConsumableAction
 local function FixTexture(self)
+	self:GetNormalTexture():SetVertexColor(0, 0, 0, 1)
 	if not self.borderFrame then
 		return
 	end
-	self:GetNormalTexture():SetVertexColor(0, 0, 0, 1)
-	if not IsEquippedAction(self.action) then
-		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+	local action = self.action
+	if IsConsumableAction(action) then
+		local count = tonumber(_G[self:GetName()..'Count']:GetText())
+		if count == 0 then
+			self.borderFrame:SetBackdropBorderColor(.6, .1, .1, 1)
+		else
+			self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+		end
+		return
+	elseif IsEquippedAction(action) then
+		self.borderFrame:SetBackdropBorderColor(.1, .6, .1, 1)
 		return
 	else
-		self.borderFrame:SetBackdropBorderColor(.1, .5, .1, 1)
+		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
 	end
 end
 hooksecurefunc('ActionButton_Update', FixTexture)
