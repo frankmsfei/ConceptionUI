@@ -1,6 +1,6 @@
-local rightBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTemplate')
+local rightBar = CreateFrame('Frame', nil, ConceptionCORE)
 	rightBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -10, -270)
-	rightBar:SetSize(25.6, 25.6*12+6*11)
+	rightBar:SetSize(26, 26*12+6*11)
 
 	for i = 1, 12 do
 		local button = _G['MultiBarRightButton'..i]
@@ -13,4 +13,3 @@ local rightBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTe
 	end
 
 MultiBarRight:SetParent(rightBar)
---MultiBarRight:EnableMouse(false)

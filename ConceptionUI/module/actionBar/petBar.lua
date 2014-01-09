@@ -1,10 +1,9 @@
 local petBar = CreateFrame('Frame', nil, ConceptionCORE)
-	petBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -80, -270)
-	petBar:SetSize(25.6, 25.6*12+6*11)
+	petBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -74, -270)
+	petBar:SetSize(26, 26*12+6*11)
 
 	for i = 1, 10 do
 		local button = _G['PetActionButton'..i]
-			button:SetParent(petBar)
 			button:ClearAllPoints()
 		if i == 1 then
 			button:SetPoint('TOPLEFT', petBar)
@@ -13,13 +12,4 @@ local petBar = CreateFrame('Frame', nil, ConceptionCORE)
 		end
 	end
 
-local function Skin(self)
-	if self.skin then
-		return
-	end
-	self.skin = true
-
-	self:SetSize(25.6, 25.6)
-end
-
---hooksecurefunc('PetActionBar_Update', Skin)
+PetActionBarFrame:SetParent(petBar)

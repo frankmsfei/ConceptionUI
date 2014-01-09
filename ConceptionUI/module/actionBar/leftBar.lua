@@ -1,6 +1,6 @@
-local leftBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTemplate')
+local leftBar = CreateFrame('Frame', nil, ConceptionCORE)
 	leftBar:SetPoint('BOTTOMRIGHT', UIParent, 'RIGHT', -42, -270)
-	leftBar:SetSize(25.6, 25.6*12+6*11)
+	leftBar:SetSize(26, 26*12+6*11)
 
 	for i = 1, 12 do
 		local button = _G['MultiBarLeftButton'..i]
@@ -13,4 +13,3 @@ local leftBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTem
 	end
 
 MultiBarLeft:SetParent(leftBar)
---MultiBarLeft:EnableMouse(false)

@@ -1,39 +1,24 @@
 local TEXTURE = select(2,...)[2].MEDIA.TEXTURE
 
-local IsEquippedAction = IsEquippedAction
-local function FixTexture(self)
-	local texture = self:GetNormalTexture()
-	if not IsEquippedAction(self.action) then
-		texture:SetVertexColor(0, 0, 0)
-		return
-	else
-		texture:SetVertexColor(0, 1, 0)
-	end
-end
-hooksecurefunc('ActionButton_ShowGrid', FixTexture)
-hooksecurefunc('ActionButton_UpdateUsable', FixTexture)
-
 local function Skin(self)
 	local name = self:GetName()
 	if name:match('OverrideActionBarButton%d') then
 		return
 	end
 
-	FixTexture(self)
-
 	if self.skin then
 		return
 	end
 	self.skin = true
 
-	self:SetSize(25.6, 25.6)
+	self:SetSize(26, 26)
 
-	local texture = self:GetNormalTexture()
-	if texture then
-		texture:SetTexture(TEXTURE.buttonOverlay)
-		texture:SetVertexColor(0, 0, 0, 1)
-		texture:ClearAllPoints()
-		texture:SetAllPoints()
+	local normal = self:GetNormalTexture()
+	if normal then
+		normal:SetTexture(TEXTURE.buttonOverlay)
+		normal:SetVertexColor(0, 0, 0, 1)
+		normal:ClearAllPoints()
+		normal:SetAllPoints()
 	end
 
 	local pushed = self:GetPushedTexture()
@@ -101,6 +86,21 @@ local function Skin(self)
 		floatingBG:Hide()
 	end
 
+	local normal2 = _G[name..'NormalTexture2']
+	if normal2 then
+		normal2:SetAlpha(0)
+	end
+
+	local flyoutBorder = self.FlyoutBorder
+	if flyoutBorder then
+		flyoutBorder:SetTexture(nil)
+	end
+	local flyoutBorderShadow = self.FlyoutBorderShadow
+	if flyoutBorderShadow then
+		flyoutBorderShadow:SetTexture(nil)
+	end
+	--local flyoutArrow = self.FlyoutArrow
+
 	if not self.shadowFrame then
 		self.shadowFrame = CreateFrame('Frame', nil, self)
 		self.shadowFrame:SetFrameLevel(self:GetFrameLevel() -1)
@@ -122,6 +122,25 @@ local function Skin(self)
 	end
  end
 hooksecurefunc('ActionButton_Update', Skin)
+hooksecurefunc('PetActionButton_OnEvent', Skin)
+
+local IsEquippedAction = IsEquippedAction
+local function FixTexture(self)
+	if not self.borderFrame then
+		return
+	end
+	self:GetNormalTexture():SetVertexColor(0, 0, 0, 1)
+	if not IsEquippedAction(self.action) then
+		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+		return
+	else
+		self.borderFrame:SetBackdropBorderColor(.1, .5, .1, 1)
+	end
+end
+hooksecurefunc('ActionButton_Update', FixTexture)
+hooksecurefunc('ActionButton_ShowGrid', FixTexture)
+hooksecurefunc('ActionButton_UpdateUsable', FixTexture)
+
 
 local function UpdateHotkeys(self, actionButtonType)
 	local hotkey = _G[self:GetName()..'HotKey']

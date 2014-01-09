@@ -10,8 +10,8 @@ local HIDE_LIST = {
 	--OverrideActionBarPowerBar,
 	--OverrideActionBarPitchFrame,
 	--OverrideActionBarLeaveFrameLeaveButton,
-	--BonusActionBarFrame, 
-	--PossessBarFrame,
+	BonusActionBarFrame, 
+	PossessBarFrame,
 	MainMenuBarBackpackButton,
 	CharacterBag0Slot,
 	CharacterBag1Slot,
@@ -47,23 +47,3 @@ for _, v in pairs(HIDE_LIST) do
 		end
     end
 end
-
-local OverrideTexList = {
-	"_BG",
-	"_MicroBGMid",
-	"_Border",
-	"EndCapL",
-	"EndCapR",
-	"Divider1",
-	"Divider2",
-	"Divider3",
-	"ExitBG",
-	"MicroBGL",
-	"MicroBGR",
-	"ButtonBGL",
-	"ButtonBGR",
-	"_ButtonBGMid",
-}
---for _, t in pairs(OverrideTexList) do
---	OverrideActionBar[t]:SetAlpha(0)
---end
