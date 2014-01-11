@@ -6,12 +6,7 @@ C.FUNC.AURA = {
 		self.anchor:SetScale(2)
 		Tip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 		Tip:ClearLines()
-		local slot = self:GetAttribute('target-slot')
-		if slot then
-			Tip:SetInventoryItem('player', slot)
-		else
-			Tip:SetUnitAura(unit, self:GetID(), filter)
-		end
+		Tip:SetUnitAura(unit, self:GetID(), filter)
 		Tip:Show()
 	end,
 	OnLeave = function(self)
@@ -21,8 +16,9 @@ C.FUNC.AURA = {
 }
 
 local AURA = C.AURAFRAME
-local function setAura(self, icon, stack, expiration)
+local function showAura(self, icon, stack, expiration, desaturated)
 	self.icon:SetTexture(icon)
+	self.icon:SetDesaturated(desaturated)
 	self.icon.overlay:Show()
 	self.shadow:Show()
 	self.stack:SetText(stack and stack>1 and stack or '')
@@ -30,7 +26,7 @@ local function setAura(self, icon, stack, expiration)
 	if expiration ~= 0 then return end
 	self.timer:SetText(nil)
 end
-local function killAura(self)
+local function hideAura(self)
 	if not self.icon:GetTexture() then return end
 	self.icon.overlay:Hide()
 	self.shadow:Hide()
@@ -43,11 +39,11 @@ end
 local UnitAura = UnitAura
 local UpdateAura = function(auras, unit, filter)
 	for i = 1, #auras do
-		local _, _, icon, stack, _, _, expiration, caster, _, _, _, _, boss = UnitAura(unit, i, filter)
+		local _, _, icon, stack, _, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
 		if icon then
-			setAura(auras[i], icon, stack, expiration)
+			showAura(auras[i], icon, stack, expiration, caster ~= 'player' or not player)
 		else
-			killAura(auras[i])
+			hideAura(auras[i])
 		end
 	end
 end
@@ -79,29 +75,40 @@ local function UpdateTimer(auras, curTime)
 	end
 end
 
+local function WeaponEnchantInfo_OnEnter(self)
+	self.anchor:SetScale(2)
+	Tip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
+	Tip:ClearLines()
+	Tip:SetInventoryItem('player', self:GetAttribute('target-slot'))
+	Tip:Show()
+end
+
 local GetWeaponEnchantInfo, GetInventoryItemTexture = GetWeaponEnchantInfo, GetInventoryItemTexture
-local UpdateEnchant = function(auras, curTime)
+local function UpdateEnchant(auras, curTime)
 	local mh, mhExpiration, _, oh, ohExpiration = GetWeaponEnchantInfo()
-	--if not mh and not oh then return end
 	if mh then
-		setAura(auras[1], GetInventoryItemTexture("player", 16))
+		showAura(auras[1], GetInventoryItemTexture("player", 16))
 		auras[1].timer:SetFormattedText(time_format(0.001 * mhExpiration))
+		auras[1]:SetScript('OnEnter', WeaponEnchantInfo_OnEnter)
 	else
-		killAura(auras[1])
+		hideAura(auras[1])
+		auras[1]:SetScript('OnEnter', nil)
 	end
 	if oh then
-		setAura(auras[2], GetInventoryItemTexture("player", 17))
+		showAura(auras[2], GetInventoryItemTexture("player", 17))
 		auras[2].timer:SetFormattedText(time_format(0.001 * ohExpiration))
+		auras[2]:SetScript('OnEnter', WeaponEnchantInfo_OnEnter)
 	else
-		killAura(auras[2])
+		hideAura(auras[2])
+		auras[2]:SetScript('OnEnter', nil)
 	end
 end
 
 local GetTime, pairs = GetTime, pairs
 local function OnUpdate(self, elapsed)
 	self.elapsed = elapsed + (self.elapsed or 0)
-	if self.elapsed < .1 then return end
-	self.elapsed = 0
+	--if self.elapsed < .1 then return end
+	--self.elapsed = 0
 	local now = GetTime()
 	for _, v in pairs(AURA) do
 		UpdateTimer(v, now)

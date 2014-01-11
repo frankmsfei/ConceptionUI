@@ -5,6 +5,17 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	local SELF = D.CFG.COMBAT_EVENT['self'] or {}
 	local CLEU = setmetatable({}, {__index = function() return function() end end})
 
+	local COLOR = setmetatable({
+		[SCHOOL_MASK_NONE]     = {r=1.00,g=1.00,b=1.00},
+		[SCHOOL_MASK_PHYSICAL] = {r=1.00,g=1.00,b=0.00},
+		[SCHOOL_MASK_HOLY]     = {r=1.00,g=0.90,b=0.50},
+		[SCHOOL_MASK_FIRE]     = {r=1.00,g=0.50,b=0.00},
+		[SCHOOL_MASK_NATURE]   = {r=0.30,g=1.00,b=0.30},
+		[SCHOOL_MASK_FROST]    = {r=0.50,g=1.00,b=1.00},
+		[SCHOOL_MASK_SHADOW]   = {r=0.50,g=0.50,b=1.00},
+		[SCHOOL_MASK_ARCANE]   = {r=1.00,g=0.50,b=1.00}
+ 	}, {__call = function(self, key) return self[key].r, self[key].g, self[key].b end})
+
 	local ColoredName = C.FUNC.UNIT.ColoredName
 	local GetSpellIcon = C.COMBATEVENT.GetSpellIcon
 
@@ -27,19 +38,19 @@ function D.LOAD.E:LoadCombatEventCLEU()
 		if sourceGUID ~= self.PLAYER then
 			return
 		end
-		self:Display('TargetSubEvent', 'IN', spellID, 'INTERRUPT', 0, 0, 1)
+		self:Display('TargetSubEvent', 'IN', spellID, nil, 'INTERRUPT', 0, 0, 1)
 		self:AddNotice(1, 1, 1, 'INTERRUPTED %s%s - %s[%s]', GetSpellIcon(spellID), spellName, GetRaidTargetIcon(destFlags2, true), ColoredName(destName))
 		self:AddMessage(self.CHANNEL, 'INTERRUPTED %s - %s[%s]', GetSpellLink(spellID), GetRaidTargetIcon(destFlags2, false), destName)
 	end
 
 
-	local function AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, auraType)
+	local function AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool, auraType)
 		if destGUID == self.PLAYER then
 			if sourceGUID == self.PLAYER then -- 上自己Buff
 				if auraType ~= 'BUFF' then
 					return -- 忽略Debuff
 				end
-				self:Display('PlayerEvent', 'IN', spellID, spellName, 1, 1, 0)
+				self:Display('PlayerEvent', 'IN', spellID, spellName, nil, COLOR(spellSchool))
 				if not SELF[spellID] then
 					return
 				end
@@ -47,12 +58,18 @@ function D.LOAD.E:LoadCombatEventCLEU()
 				self:AddMessage(self.CHANNEL, '%s ACTIVATE', GetSpellLink(spellID))
 				return
 			else -- 別人上我BUFF
-				self:AddNotice(1, 1, 0, '+ %s%s [%s] +', GetSpellIcon(spellID), spellName, ColoredName(sourceName))
-				self:Display('PlayerSubEvent', 'IN', spellID, spellName, 1, 1, 0)
+				if sourceName then
+					self:AddNotice(1, 1, 0, '+ %s%s [%s] +', GetSpellIcon(spellID), spellName, ColoredName(sourceName))
+				else
+					self:AddNotice(1, 1, 0, '+ %s%s +', GetSpellIcon(spellID), spellName)
+				end
+				self:Display('PlayerSubEvent', 'IN', spellID, spellName, nil, COLOR(spellSchool))
 				return
 			end
 		else -- 我放在其他人身上
-			self:Display('TargetSubEvent', 'IN', spellID, spellName, 1, 1, 0)
+			if destGUID == C.UNITFRAME.Major['target'].guid then
+				self:Display('TargetSubEvent', 'IN', spellID, spellName, nil, COLOR(spellSchool))
+			end
 			if not AURA[spellID] then
 				return
 			end
@@ -61,26 +78,26 @@ function D.LOAD.E:LoadCombatEventCLEU()
 		end
 	end
 
-	function CLEU:SPELL_AURA_APPLIED(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, _, auraType)
-		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, auraType)
+	function CLEU:SPELL_AURA_APPLIED(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool, auraType)
+		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool, auraType)
 	end
 
-	function CLEU:SPELL_AURA_APPLIED_DOSE(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, _, auraType)
-		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, auraType)
+	function CLEU:SPELL_AURA_APPLIED_DOSE(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool, auraType)
+		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool, auraType)
 	end
 
-	function CLEU:SPELL_AURA_REFRESH(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, _, auraType)
-		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, auraType)
+	function CLEU:SPELL_AURA_REFRESH(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool, auraType)
+		AuraApplied(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool, auraType)
 	end
 
 
-	local function AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName)
+	local function AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool)
 		if destGUID == self.PLAYER then
 			if sourceGUID == self.PLAYER then
-				if auraType ~= 'BUFF' then
-					return -- 忽略Debuff
-				end
-				self:Display('PlayerSubEvent', 'OUT', spellID, spellName, 1, 0, 0)
+				--if auraType ~= 'BUFF' then
+					--return -- 忽略Debuff
+				--end
+				self:Display('PlayerSubEvent', 'OUT', spellID, spellName, nil, COLOR(spellSchool))
 				if not SELF[spellID] then
 					return
 				end
@@ -88,12 +105,18 @@ function D.LOAD.E:LoadCombatEventCLEU()
 				self:AddMessage(self.CHANNEL, '%s DEACTIVATE', GetSpellLink(spellID))
 				return
 			else
-				self:AddNotice(1, 1, 0, '- %s%s [%s] -', GetSpellIcon(spellID), spellName, ColoredName(sourceName))
-				self:Display('PlayerSubEvent', 'OUT', spellID, spellName, 1, 0, 0)
+				if sourceName then
+					self:AddNotice(1, 1, 0, '- %s%s [%s] -', GetSpellIcon(spellID), spellName, ColoredName(sourceName))
+				else
+					self:AddNotice(1, 1, 0, '- %s%s -', GetSpellIcon(spellID), spellName)
+				end
+				self:Display('PlayerSubEvent', 'OUT', spellID, spellName, nil, COLOR(spellSchool))
 				return
 			end
 		else -- sourceGUID == self.PLAYER
-			self:Display('TargetSubEvent', 'OUT', spellID, spellName, 1, 0, 0)
+			if destGUID == C.UNITFRAME.Major['target'].guid then
+				self:Display('TargetSubEvent', 'OUT', spellID, spellName, nil, COLOR(spellSchool))
+			end
 			if not AURA[spellID] then
 				return
 			end
@@ -102,49 +125,86 @@ function D.LOAD.E:LoadCombatEventCLEU()
 		end
 	end
 
-	function CLEU:SPELL_AURA_REMOVED(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName)
-		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName)
+	function CLEU:SPELL_AURA_REMOVED(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool)
+		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool)
 	end
 
-	function CLEU:SPELL_AURA_REMOVED_DOES(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName)
-		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName)
+	function CLEU:SPELL_AURA_REMOVED_DOES(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool)
+		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool)
 	end
 
-	function CLEU:SPELL_AURA_BROKEN(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName)
-		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName)
+	function CLEU:SPELL_AURA_BROKEN(sourceGUID, sourceName, _, _, destGUID, destName, _, destFlags2, spellID, spellName, spellSchool)
+		AuraRemoved(self, sourceGUID, sourceName, destGUID, destName, destFlags2, spellID, spellName, spellSchool)
 	end
 
 
-	local function AttackMissed(self, sourceGUID, spellID, missType)
+	local function AttackMissed(self, sourceGUID, destGUID, spellID, spellSchool, missType)
 		if sourceGUID == self.PLAYER then
-			self:Display('TargetEvent', 'OUT', spellID, missType, 1, 0, 0)
+			if destGUID == C.UNITFRAME.Major['target'].guid then
+				self:Display('TargetEvent', 'OUT', spellID, nil, missType, COLOR(spellSchool))
+			end
 			return
 		else
-			self:Display('PlayerEvent', 'OUT', spellID, missType, 1, 0, 0)
+			self:Display('PlayerEvent', 'OUT', spellID, nil, missType, COLOR(spellSchool))
 			return
 		end
 	end
 
-	function CLEU:SWING_MISSED(sourceGUID, _, _, _, _, _, _, _, missType)
-		AttackMissed(self, sourceGUID, 46917, missType)
+	function CLEU:SWING_MISSED(sourceGUID, _, _, _, destGUID, _, _, _, missType)
+		AttackMissed(self, sourceGUID, destGUID, 46917, 1, missType)
 	end
 
-	function CLEU:RANGE_MISSED(sourceGUID, _, _, _, _, _, _, _, spellID, _, _, missType)
-		AttackMissed(self, sourceGUID, spellID, missType)
+	function CLEU:RANGE_MISSED(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, missType)
+		AttackMissed(self, sourceGUID, destGUID, spellID, spellSchool, missType)
 	end
 
-	function CLEU:SPELL_MISSED(sourceGUID, _, _, _, _, _, _, _, spellID, _, _, missType)
-		AttackMissed(self, sourceGUID, spellID, missType)
+	function CLEU:SPELL_MISSED(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, missType)
+		AttackMissed(self, sourceGUID, destGUID, spellID, spellSchool, missType)
 	end
 
-	function CLEU:SPELL_PERIODIC_MISSED(sourceGUID, _, _, _, _, _, _, _, spellID, _, _, missType)
-		AttackMissed(self, sourceGUID, spellID, missType)
+	function CLEU:SPELL_PERIODIC_MISSED(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, missType)
+		AttackMissed(self, sourceGUID, destGUID, spellID, spellSchool, missType)
 	end
 
-	function CLEU:SWING_DAMAGE(_, _, _, _, _, _, _, _, amount)
-		self:Display('TargetEvent', 'IN', 46917, amount, 1, 1, 1)
+	local function Attacked(self, sourceGUID, destGUID, spellID, spellSchool, amount, crit)
+		if not crit then return end
+		if sourceGUID == self.PLAYER then
+			if destGUID == C.UNITFRAME.Major['target'].guid then
+				self:Display('TargetEvent', 'IN', spellID, nil, amount, COLOR(spellSchool))
+				return
+			elseif destGUID == self.PLAYER then
+				self:Display('PlayerEvent', 'IN', spellID, nil, amount, COLOR(spellSchool))
+				return
+			end
+		elseif destGUID == self.PLAYER then
+			self:Display('PlayerEvent', 'IN', spellID, nil, amount, COLOR(spellSchool))
+			return
+		end
 	end
 
+	function CLEU:SWING_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, 46917, 1, amount, crit)
+	end
+
+	function CLEU:RANGE_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, spellID, spellSchool, amount, crit)
+	end
+
+	function CLEU:SPELL_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, spellID, spellSchool, amount, crit)
+	end
+
+	function SPELL_PERIODIC_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, spellID, spellSchool, amount, crit)
+	end
+
+	function SPELL_BUILDING_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, spellID, spellSchool, amount, crit)
+	end
+
+	function CLEU:ENVIRONMENTAL_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, type, amount, _, _, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, 46917, 1, ('%d(%s)'):format(amount, type), 1)
+	end
 
 	C.COMBATEVENT.CLEU = CLEU
 end

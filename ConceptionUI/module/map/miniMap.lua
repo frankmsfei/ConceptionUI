@@ -13,15 +13,20 @@ function D.LOAD.M:SkinMinimap()
 	MinimapBackdrop:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 5, -5)
 	MinimapBackdrop:SetBackdrop(D.MEDIA.TEXTURE.dropshadow)
 	MinimapBackdrop:SetBackdropBorderColor(0, 0, 0, .6)
-	MinimapBackdrop:RegisterEvent('CALENDAR_UPDATE_PENDING_INVITES')
-	MinimapBackdrop:RegisterEvent('CALENDAR_ACTION_PENDING')
-	MinimapBackdrop:SetScript('OnEvent', function(self, event)
+
+	local function OnCalendarUpdate(self, event)
 		if event == 'CALENDAR_UPDATE_PENDING_INVITES' then
 			self:SetBackdropBorderColor(.618, .618, 0, .6)
-		elseif event == 'CALENDAR_ACTION_PENDING' then
+		elseif event == 'CALENDAR_EVENT_ALARM' then
+			self:SetBackdropBorderColor(.618, 0, 0, .6)
+		else
 			self:SetBackdropBorderColor(0, 0, 0, .6)
 		end
-	end)
+	end
+	MinimapBackdrop:RegisterEvent('CALENDAR_UPDATE_PENDING_INVITES')
+	MinimapBackdrop:RegisterEvent('CALENDAR_ACTION_PENDING')
+	MinimapBackdrop:RegisterEvent('CALENDAR_EVENT_ALARM')
+	MinimapBackdrop:SetScript('OnEvent', OnCalendarUpdate)
 
 	Minimap.Overlay = Minimap:CreateTexture(nil, 'BORDER')
 	Minimap.Overlay:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', 0, 0)
@@ -33,7 +38,7 @@ function D.LOAD.M:SkinMinimap()
 	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
 
 	MiniMapChallengeMode:ClearAllPoints()
-	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
+	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 2, 1)
 
 	GuildInstanceDifficulty:ClearAllPoints()
 	GuildInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
@@ -59,8 +64,7 @@ function D.LOAD.M:SkinMinimap()
 	MinimapZoneText:SetShadowOffset(1, 1)
 	MinimapZoneText:SetShadowColor(0, 0, 0, .7)
 
-	MinimapCluster:RegisterEvent('PLAYER_ENTERING_WORLD')
-	MinimapCluster:HookScript('OnEvent', function()
+	local function UpdateZoneText()
 		SetMapToCurrentZone()
 		local r, g, b = MinimapZoneText:GetTextColor()
 		MinimapZoneText:SetTextColor(.618*r, .618*g, .618*b)
@@ -71,15 +75,20 @@ function D.LOAD.M:SkinMinimap()
 		else
 			MinimapZoneText:SetText(realzone)
 		end
+	end
+	MinimapCluster:RegisterEvent('PLAYER_ENTERING_WORLD')
+	MinimapCluster:HookScript('OnEvent', UpdateZoneText)
+
+	local function ShowGuildTabard()
 		if not MiniMapInstanceDifficulty:IsShown() and not MiniMapChallengeMode:IsShown() and not GuildInstanceDifficulty:IsShown() then
 			SetSmallGuildTabardTextures('player', GuildInstanceDifficulty.emblem, GuildInstanceDifficulty.background, GuildInstanceDifficulty.border)
-			GuildInstanceDifficultyHeroicTexture:Hide()
 			GuildInstanceDifficultyChallengeModeTexture:Hide()
+			GuildInstanceDifficultyHeroicTexture:Hide()
 			GuildInstanceDifficultyText:SetText()
 			GuildInstanceDifficulty:Show()
 		end
-	end)
-
+	end
+	hooksecurefunc('MiniMapInstanceDifficulty_Update', ShowGuildTabard)
 
 	do -- Hide Obj
 		LoadAddOn('Blizzard_TimeManager')

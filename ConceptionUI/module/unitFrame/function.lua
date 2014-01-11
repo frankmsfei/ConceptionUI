@@ -136,7 +136,10 @@ end
 
 local UnitExists, UnitIsAFK, UnitIsDND, UnitIsConnected = UnitExists, UnitIsAFK, UnitIsDND, UnitIsConnected
 local function NameCheck(frame, unit)
-	if not UnitExists(unit) then return end
+	if not UnitExists(unit) then
+		return
+	end
+	frame.guid = UnitGUID(unit)
 	if not frame.target then
 		local status = (UnitIsAFK(unit) and '|cFF9E6100AFK|r') or (UnitIsDND(unit) and '|cFF9E0000DND|r') or (not UnitIsConnected(unit) and '|cFF616161DC|r') or ''
 		if unit == 'player' then
@@ -191,6 +194,7 @@ function FUNC.OnHide(frame)
 	frame.ppBar:SetValue(0)
 	frame.hpBar:SetScript('OnValueChanged', nil)
 	frame.ppBar:SetScript('OnValueChanged', nil)
+	frame.guid = nil
 	if frame.taregt then frame.target:SetText(nil) end
 	if frame.hpInfo then frame.hpInfo:SetText(nil) end
 	if frame.ppInfo then frame.ppInfo:SetText(nil) end

@@ -1,19 +1,14 @@
 local C, D = unpack(select(2,...))
-	C.AURAFRAME['TargetBuff'] = true
 
 function D.LOAD.I:LoadTargetBuff()
 	local func, api = C.FUNC.AURA, D.API
 	local Frame, Button, Icon, DropShadow, String = api.Frame, api.Button, api.Icon, api.DropShadow, api.String
-
 	local cfg = D.CFG['AURA_MAJOR']
-	local F = Frame('ConceptionUI TargetBuff', C.UNITFRAME.Major['target'])
-		F:SetAlpha(cfg.alpha)
 
-	local function CreateAura(i)
-		local a = Button('Conception UI TargetBuff '..i, F, 'TOPLEFT', 'ConceptionUI TargetFrame PowerBar', 'BOTTOMLEFT', (cfg.size + cfg.gap) * (i-1) - 10, -28, cfg.size, cfg.size)
+	local function CreateAura(name, i, parent)
+		local a = Button(name..i, parent, 'TOPLEFT', 'ConceptionUI TargetFrame PowerBar', 'BOTTOMLEFT', (cfg.size + cfg.gap) * (i-1) - 10, -28, cfg.size, cfg.size)
 			a:SetID(i)
-			a:HookScript('OnEnter', function(self) return func.OnEnter(self, 'target', 'HELPFUL') end)
-			a:HookScript('OnLeave', func.OnLeave)
+			a:SetScript('OnLeave', func.OnLeave)
 			a.anchor = Frame(nil, a, 'CENTER', a, 'CENTER', 0, 0, cfg.size, cfg.size)
 			a.icon = Icon(a.anchor, cfg.size, 'BACKGROUND')
 			a.icon.overlay:Hide()
@@ -24,6 +19,17 @@ function D.LOAD.I:LoadTargetBuff()
 		return a
 	end
 
-	for i = 1, cfg.amount do F[i] = CreateAura(i) end
+	local function OnEnter(self)
+		return func.OnEnter(self, 'target', 'HELPFUL')
+	end
+
+	local F = Frame('ConceptionUI TargetBuff', C.UNITFRAME.Major['target'])
+		F:SetAlpha(cfg.alpha)
+
+	for i = 1, cfg.amount do
+		F[i] = CreateAura('ConceptionUI TargetBuff', i, F)
+		F[i]:SetScript('OnEnter', OnEnter)
+	end
+
 	C.AURAFRAME['TargetBuff'] = F
 end

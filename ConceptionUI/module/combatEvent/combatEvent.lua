@@ -4,6 +4,7 @@ function D.LOAD.M:LoadCombatEvent()
 	
 	local API, FUNC = D.API, C.FUNC.UNIT
 	local Frame, Icon, DropShadow, String = API.Frame, API.Icon, API.DropShadow, API.String
+	local cfg = D.CFG['COMBAT_EVENT']
 
 	local  function Finished(self)
 		self.parent:Hide()
@@ -79,11 +80,12 @@ function D.LOAD.M:LoadCombatEvent()
 		return AG
 	end
 
-	local TargetEvent = Frame('Conception TargetEvent', C, 'LEFT', UIParent, 'CENTER', D.CFG['COMBAT_EVENT'].x, D.CFG['COMBAT_EVENT'].y, 22, 22)
+	local TargetEvent = Frame('Conception TargetEvent', C, 'LEFT', UIParent, 'CENTER', cfg.x, cfg.y, 22, 22)
 		TargetEvent:SetFrameLevel(9)
 		TargetEvent.icon = Icon(TargetEvent, 22, 'BACKGROUND')
 		TargetEvent.shadow = DropShadow(TargetEvent)
-		TargetEvent.string = String(TargetEvent, 'LEFT', TargetEvent, 'RIGHT', 4, 0, D.CFG['COMBAT_EVENT'].font, D.CFG['COMBAT_EVENT'].fontSize, D.CFG['COMBAT_EVENT'].fontFlag, 1.25, -1.25)
+		TargetEvent.amount = String(TargetEvent, 'LEFT', TargetEvent, 'RIGHT', 4, 0, cfg.font, cfg.fontSize, cfg.fontFlag, 1.25, -1.25)
+		TargetEvent.spellname = String(TargetEvent, 'LEFT', TargetEvent, 'RIGHT', 4, 0, cfg.spellname_font, cfg.spellname_fontSize, cfg.spellname_fontFlag, 1.25, -1.25)
 
 		TargetEvent.IN = CreateAni_H(TargetEvent)
 		TargetEvent.IN.moveIni:SetOffset(-20, 0)
@@ -103,7 +105,8 @@ function D.LOAD.M:LoadCombatEvent()
 		TargetSubEvent:SetFrameLevel(9)
 		TargetSubEvent.icon = Icon(TargetSubEvent, 20, 'BACKGROUND')
 		TargetSubEvent.shadow = DropShadow(TargetSubEvent)
-		TargetSubEvent.string = String(TargetSubEvent, 'LEFT', TargetSubEvent, 'RIGHT', 3, 0, D.CFG['COMBAT_EVENT'].font, .8*D.CFG['COMBAT_EVENT'].fontSize, D.CFG['COMBAT_EVENT'].fontFlag, 1, -1)
+		TargetSubEvent.amount = String(TargetSubEvent, 'LEFT', TargetSubEvent, 'RIGHT', 3, 0, cfg.font, .8*cfg.fontSize, cfg.fontFlag, 1, -1)
+		TargetSubEvent.spellname = String(TargetSubEvent, 'LEFT', TargetSubEvent, 'RIGHT', 3, 0, cfg.spellname_font, .8*cfg.spellname_fontSize, cfg.spellname_fontFlag, 1, -1)
 
 		TargetSubEvent.IN = CreateAni_H(TargetSubEvent)
 		TargetSubEvent.IN.moveIni:SetOffset(-16, 0)
@@ -119,11 +122,12 @@ function D.LOAD.M:LoadCombatEvent()
 
 		TargetSubEvent:Hide()
 
-	local PlayerEvent = Frame('Conception PlayerEvent', C, 'RIGHT', UIParent, 'CENTER', -D.CFG['COMBAT_EVENT'].x, D.CFG['COMBAT_EVENT'].y, 22, 22)
+	local PlayerEvent = Frame('Conception PlayerEvent', C, 'RIGHT', UIParent, 'CENTER', -cfg.x, cfg.y, 22, 22)
 		PlayerEvent:SetFrameLevel(9)
 		PlayerEvent.icon = Icon(PlayerEvent, 22, 'BACKGROUND')
 		PlayerEvent.shadow = DropShadow(PlayerEvent)
-		PlayerEvent.string = String(PlayerEvent, 'RIGHT', PlayerEvent.icon, 'LEFT', -4, 0, D.CFG['COMBAT_EVENT'].font, D.CFG['COMBAT_EVENT'].fontSize, D.CFG['COMBAT_EVENT'].fontFlag, -1.25, -1.25)
+		PlayerEvent.amount = String(PlayerEvent, 'RIGHT', PlayerEvent.icon, 'LEFT', -4, 0, cfg.font, cfg.fontSize, cfg.fontFlag, -1.25, -1.25)
+		PlayerEvent.spellname = String(PlayerEvent, 'RIGHT', PlayerEvent.icon, 'LEFT', -4, 0, cfg.spellname_font, cfg.spellname_fontSize, cfg.spellname_fontFlag, -1.25, -1.25)
 
 		PlayerEvent.IN = CreateAni_H(PlayerEvent)
 		PlayerEvent.IN.moveIni:SetOffset(20, 0)
@@ -143,7 +147,8 @@ function D.LOAD.M:LoadCombatEvent()
 		PlayerSubEvent:SetFrameLevel(9)
 		PlayerSubEvent.icon = Icon(PlayerSubEvent, 20, 'BACKGROUND')
 		PlayerSubEvent.shadow = DropShadow(PlayerSubEvent)
-		PlayerSubEvent.string = String(PlayerSubEvent, 'RIGHT', PlayerSubEvent.icon, 'LEFT', -3, 0, D.CFG['COMBAT_EVENT'].font, .8*D.CFG['COMBAT_EVENT'].fontSize, D.CFG['COMBAT_EVENT'].fontFlag, -1, -1)
+		PlayerSubEvent.amount = String(PlayerSubEvent, 'RIGHT', PlayerSubEvent.icon, 'LEFT', -3, 0, cfg.font, .8*cfg.fontSize, cfg.fontFlag, -1, -1)
+		PlayerSubEvent.spellname = String(PlayerSubEvent, 'RIGHT', PlayerSubEvent.icon, 'LEFT', -3, 0, cfg.spellname_font, .8*cfg.spellname_fontSize, cfg.spellname_fontFlag, -1, -1)
 
 		PlayerSubEvent.IN = CreateAni_H(PlayerSubEvent)
 		PlayerSubEvent.IN.moveIni:SetOffset(16, 0)
@@ -165,7 +170,7 @@ function D.LOAD.M:LoadCombatEvent()
 		frame[line]:SetAlpha(0)
 		frame[line].icon = Icon(frame[line], 16, 'ARTWORK')
 		frame[line].shadow = DropShadow(frame[line])
-		frame[line].string = String(frame[line], 'TOP', frame[line], 'BOTTOM', 0, 0, D.CFG['COMBAT_EVENT'].font, D.CFG['COMBAT_EVENT'].fontSize-4, D.CFG['COMBAT_EVENT'].fontFlag, 0, 0)
+		frame[line].amount = String(frame[line], 'TOP', frame[line], 'BOTTOM', 0, 0, cfg.font, cfg.fontSize-4, cfg.fontFlag, 0, 0)
 		frame[line].UP = CreateAni_V(frame[line])
 		frame[line]:Hide()
 	end
@@ -174,14 +179,14 @@ function D.LOAD.M:LoadCombatEvent()
 		CreateScroll(PlayerEvent, i)
 		local line = 'line'..i
 		PlayerEvent[line]:ClearAllPoints()
-		PlayerEvent[line]:SetPoint('RIGHT', UIParent, 'CENTER', -D.CFG['COMBAT_EVENT'].x-32, D.CFG['COMBAT_EVENT'].y)
-		PlayerEvent[line].string:ClearAllPoints()
-		PlayerEvent[line].string:SetPoint('RIGHT', PlayerEvent[line].icon, 'LEFT', -2, 0)
+		PlayerEvent[line]:SetPoint('RIGHT', UIParent, 'CENTER', -cfg.x-32, cfg.y)
+		PlayerEvent[line].amount:ClearAllPoints()
+		PlayerEvent[line].amount:SetPoint('RIGHT', PlayerEvent[line].icon, 'LEFT', -2, 0)
 		CreateScroll(TargetEvent, i)
 		TargetEvent[line]:ClearAllPoints()
-		TargetEvent[line]:SetPoint('LEFT', UIParent, 'CENTER', D.CFG['COMBAT_EVENT'].x+32, D.CFG['COMBAT_EVENT'].y)
-		TargetEvent[line].string:ClearAllPoints()
-		TargetEvent[line].string:SetPoint('LEFT', TargetEvent[line].icon, 'RIGHT', 2, 0)
+		TargetEvent[line]:SetPoint('LEFT', UIParent, 'CENTER', cfg.x+32, cfg.y)
+		TargetEvent[line].amount:ClearAllPoints()
+		TargetEvent[line].amount:SetPoint('LEFT', TargetEvent[line].icon, 'RIGHT', 2, 0)
 	end
 ]]
 	local CombatEvent = CreateFrame('Frame', 'CombatEvent', C)
@@ -214,8 +219,8 @@ function D.LOAD.M:LoadCombatEvent()
 	local function DisplayScroll(line, icon, text, r, g, b)
 		if line.UP:IsPlaying() then return end
 		line.icon:SetTexture(icon)
-		line.string:SetText(text)
-		line.string:SetTextColor(r, g, b)
+		line.amount:SetText(text)
+		line.amount:SetTextColor(r, g, b)
 		line.UP:Play()
 		line:Show()
 	end
@@ -227,23 +232,23 @@ function D.LOAD.M:LoadCombatEvent()
 		end
 	end
 ]]
-	function CombatEvent:Display(frame, animation, iconID, text, r, g, b)
+	function CombatEvent:Display(frame, animation, iconID, spellname, amount, r, g, b)
 		frame = CombatEvent[frame]
 		frame:Hide()
 		frame[animation]:Stop()
 		frame.icon:SetTexture(GetSpellTexture(iconID))
-		frame.string:SetText(text)
-		frame.string:SetTextColor(r, g, b)
+		frame.spellname:SetText(spellname)
+		frame.spellname:SetTextColor(r, g, b)
+		frame.amount:SetText(amount)
+		frame.amount:SetTextColor(r, g, b)
 		frame[animation]:Play()
 		frame:Show()
 	end
 
 
-	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(_, combatEvent, _, sourceGUID, sourceName, destGUID, ...)
-		--local _, _, _, spellID = ...
-		--print(_, combatEvent, _, sourceGUID, sourceName, destGUID, ...)
-		if sourceGUID ~= self.PLAYER and destGUID ~= self.PLAYER then return end
-		self.CLEU[combatEvent](self, sourceGUID, sourceName, destGUID, ...)
+	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(_, combatEvent, _, sourceGUID, sourceName, _, _, destGUID, ...)
+		if (sourceGUID ~= self.PLAYER) and (destGUID ~= self.PLAYER) then return end
+		self.CLEU[combatEvent](self, sourceGUID, sourceName, _, _, destGUID, ...)
 	end
 
 

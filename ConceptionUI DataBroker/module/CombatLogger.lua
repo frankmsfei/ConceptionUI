@@ -16,7 +16,8 @@ end
 function CombatLogger:Update()
 	local status = false
 	if IsInInstance() then
-		if GetCurrentMapAreaID() == 953 then
+		local AreaID = GetCurrentMapAreaID()
+		if AreaID == 953 or AreaID == 930 then
 			status = true
 		end
 	end

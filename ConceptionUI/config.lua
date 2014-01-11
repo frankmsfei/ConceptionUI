@@ -67,9 +67,12 @@ D.CFG = {
 	['COMBAT_EVENT']				= {
 		x					= 60,
 		y					= -8,
-		font					= DAMAGE_TEXT_FONT,
+		font					= FONT.edo,
 		fontSize				= 20,
 		fontFlag				= 'THINOUTLINE',
+		spellname_font			= DAMAGE_TEXT_FONT,
+		spellname_fontSize		= 14,
+		spellname_fontFlag		= 'THINOUTLINE',
 		critsound				= SOUND.Excellent,
 		hurtsound				= SOUND.Damn,
 							  },
