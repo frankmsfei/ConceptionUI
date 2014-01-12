@@ -35,7 +35,7 @@ function D.LOAD.M:SkinMinimap()
 	Minimap.Overlay:SetVertexColor(0, 0, 0, 1)
 
 	MiniMapInstanceDifficulty:ClearAllPoints()
-	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
+	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
 
 	MiniMapChallengeMode:ClearAllPoints()
 	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 2, 1)

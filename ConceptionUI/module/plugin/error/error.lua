@@ -1,6 +1,6 @@
 UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
 
-local F = CreateFrame ("Frame", 'ConceptionUI ErrorFrame', ConceptionUI[1])
+local F = CreateFrame ("Frame", 'ConceptionUI ErrorFrame', ConceptionCORE)
 	F:SetFrameStrata('TOOLTIP')
 	F.fadeInTime = 0
 	F.fadeOutTime = .2

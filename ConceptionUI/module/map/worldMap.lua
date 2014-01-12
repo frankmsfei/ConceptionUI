@@ -2,7 +2,14 @@ WorldMapFrame.Position = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
 WorldMapFrame.Position:SetFont(STANDARD_TEXT_FONT, 12, 'THINOUTLINE')
 WorldMapFrame.Position:SetPoint('BOTTOMLEFT', WorldMapPositioningGuide, 'BOTTOMLEFT', 10, 10)
 
-local GetPlayerMapPosition = GetPlayerMapPosition
+WorldMapFrame.Clock = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
+WorldMapFrame.Clock:SetFont(DAMAGE_TEXT_FONT, 24, 'OUTLINE')
+WorldMapFrame.Clock:SetPoint('BOTTOM', WorldMapPositioningGuide, 'TOP', 0, 12)
+
+WorldMapFrame.Date = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
+WorldMapFrame.Date:SetFont(DAMAGE_TEXT_FONT, 12, 'OUTLINE')
+WorldMapFrame.Date:SetPoint('BOTTOM', WorldMapFrame.Clock, 'TOP', 0, 12)
+
 local function GetCoordinate()
 	local x, y = GetPlayerMapPosition('player')
 	return 100*x, 100*y
@@ -10,6 +17,15 @@ end
 
 WorldMapFrame:HookScript('OnUpdate', function(self)
 	self.Position:SetFormattedText('%.2f , %.2f', GetCoordinate())
+	self.Clock:SetFormattedText('%.2d:%.2d', GetGameTime())
+	self.Date:SetText(date('%A, %b %d'))
+end)
+
+hooksecurefunc(WorldMapFrame, "Show", function(self)
+	self:SetScale(.64)
+	self:EnableKeyboard(false)
+	BlackoutWorld:Hide()
+	WorldMapFrame:EnableMouse(false)
 end)
 
 local UnitClass, UnitName, UnitGroupRolesAssigned, RAID_CLASS_COLORS = UnitClass, UnitName, UnitGroupRolesAssigned, RAID_CLASS_COLORS

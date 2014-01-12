@@ -16,10 +16,29 @@ C.FUNC.AURA = {
 }
 
 local AURA = C.AURAFRAME
-local function showAura(self, icon, stack, expiration, desaturated)
-	self.icon:SetTexture(icon)
+
+local function GetDispelTypeColor(dispelType)
+	if not dispelType then
+		return .618, 0, 0
+	end
+	if dispelType == 'Disease' then
+		return 0, .618, .191
+	elseif dispelType == 'Curse' then
+		return .618, 0, .618
+	elseif dispelType == 'Magic' then
+		return 0, .191, .618
+	elseif dispelType == 'Poison' then
+		return .618, .618, 0
+	end
+end
+
+local function showAura(self, icon, stack, dispelType, expiration, desaturated, debuff)
 	self.icon:SetDesaturated(desaturated)
 	self.icon.overlay:Show()
+	self.icon:SetTexture(icon)
+	if debuff then
+		self.shadow:SetBackdropBorderColor(GetDispelTypeColor(dispelType))
+	end
 	self.shadow:Show()
 	self.stack:SetText(stack and stack>1 and stack or '')
 	self.expiration = expiration or 0
@@ -37,11 +56,11 @@ local function hideAura(self)
 end
 
 local UnitAura = UnitAura
-local UpdateAura = function(auras, unit, filter)
+local UpdateAura = function(auras, unit, filter, debuff)
 	for i = 1, #auras do
-		local _, _, icon, stack, _, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
+		local _, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
 		if icon then
-			showAura(auras[i], icon, stack, expiration, caster ~= 'player' or not player)
+			showAura(auras[i], icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
 		else
 			hideAura(auras[i])
 		end
@@ -113,7 +132,7 @@ local function OnUpdate(self, elapsed)
 	for _, v in pairs(AURA) do
 		UpdateTimer(v, now)
 	end
-	UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'TARGET|HARMFUL')
+	UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'HARMFUL', true)
 	UpdateEnchant(AURA['PlayerTemporarydBuff'], now)
 end
 
@@ -126,16 +145,16 @@ local	F = CreateFrame('Frame')
 function F:UNIT_AURA(unit)
 	if not VALID[unit] then return end
 	if unit=='player' then
-		UpdateAura(AURA['PlayerBuff'], unit, 'PLAYER|HELPFUL')
-		UpdateAura(AURA['PlayerDeBuff'], unit, 'HARMFUL')
-		UpdateAura(AURA['PlayerRaidBuff'], unit, 'HELPFUL')
+		UpdateAura(AURA['PlayerBuff'], unit, 'PLAYER|HELPFUL', false)
+		UpdateAura(AURA['PlayerDeBuff'], unit, 'HARMFUL', true)
+		UpdateAura(AURA['PlayerRaidBuff'], unit, 'HELPFUL', false)
 		return
 	elseif unit=='target' then
-		UpdateAura(AURA['TargetBuff'], unit, 'HELPFUL')
-		UpdateAura(AURA['TargetDeBuff'], unit, 'HARMFUL')
+		UpdateAura(AURA['TargetBuff'], unit, 'HELPFUL', false)
+		UpdateAura(AURA['TargetDeBuff'], unit, 'HARMFUL', true)
 		return
 	elseif unit=='focus' then
-		UpdateAura(AURA['FocusDeBuff'], unit, 'HARMFUL')
+		UpdateAura(AURA['FocusDeBuff'], unit, 'HARMFUL', true)
 		return
 	end
 end
@@ -144,18 +163,18 @@ function F:UNIT_TARGET(unit)
 	if not VALID[unit] then return end
 	if unit=='focus' or unit=='targettarget' then return end
 	if unit=='player' then
-		UpdateAura(AURA['TargetBuff'], 'target', 'HELPFUL')
+		UpdateAura(AURA['TargetBuff'], 'target', 'HELPFUL', false)
 		UpdateAura(AURA['TargetDeBuff'], 'target', 'HARMFUL')
-		UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'TARGET|HARMFUL')
+		UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'HARMFUL', true)
 		return
 	elseif unit=='target' then
-		UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'TARGET|HARMFUL')
+		UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'HARMFUL', true)
 		return
 	end
 end
 
 function F:PLAYER_FOCUS_CHANGED()
-	UpdateAura(AURA['FocusDeBuff'], 'focus', 'HARMFUL')
+	UpdateAura(AURA['FocusDeBuff'], 'focus', 'HARMFUL', true)
 end
 
 function F:PLAYER_ENTERING_WORLD()

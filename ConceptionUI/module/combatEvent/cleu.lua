@@ -6,14 +6,14 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	local CLEU = setmetatable({}, {__index = function() return function() end end})
 
 	local COLOR = setmetatable({
-		[SCHOOL_MASK_NONE]     = {r=1.00,g=1.00,b=1.00},
-		[SCHOOL_MASK_PHYSICAL] = {r=1.00,g=1.00,b=0.00},
-		[SCHOOL_MASK_HOLY]     = {r=1.00,g=0.90,b=0.50},
-		[SCHOOL_MASK_FIRE]     = {r=1.00,g=0.50,b=0.00},
-		[SCHOOL_MASK_NATURE]   = {r=0.30,g=1.00,b=0.30},
-		[SCHOOL_MASK_FROST]    = {r=0.50,g=1.00,b=1.00},
-		[SCHOOL_MASK_SHADOW]   = {r=0.50,g=0.50,b=1.00},
-		[SCHOOL_MASK_ARCANE]   = {r=1.00,g=0.50,b=1.00}
+		[SCHOOL_MASK_NONE]     = {r=.191,g=.191,b=.191},
+		[SCHOOL_MASK_PHYSICAL] = {r=.618,g=.000,b=.000},
+		[SCHOOL_MASK_HOLY]     = {r=.618,g=.618,b=.000},
+		[SCHOOL_MASK_FIRE]     = {r=.618,g=.382,b=.000},
+		[SCHOOL_MASK_NATURE]   = {r=.191,g=.618,b=.191},
+		[SCHOOL_MASK_FROST]    = {r=.382,g=.618,b=.618},
+		[SCHOOL_MASK_SHADOW]   = {r=.382,g=.382,b=.618},
+		[SCHOOL_MASK_ARCANE]   = {r=.618,g=.382,b=.618}
  	}, {__call = function(self, key) return self[key].r, self[key].g, self[key].b end})
 
 	local ColoredName = C.FUNC.UNIT.ColoredName
@@ -182,8 +182,8 @@ function D.LOAD.E:LoadCombatEventCLEU()
 		end
 	end
 
-	function CLEU:SWING_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, amount, _, _, _, _, _, crit)
-		Attacked(self, sourceGUID, destGUID, 46917, 1, amount, crit)
+	function CLEU:SWING_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, amount, _, spellSchool, _, _, _, crit)
+		Attacked(self, sourceGUID, destGUID, 46917, spellSchool, amount, crit)
 	end
 
 	function CLEU:RANGE_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, spellSchool, amount, _, _, _, _, _, crit)

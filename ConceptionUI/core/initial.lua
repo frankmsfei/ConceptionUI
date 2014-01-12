@@ -8,7 +8,11 @@ function D.LOAD.P:Initial()
 
 	-- RaidBossEmoteFrame
 	RaidBossEmoteFrame:ClearAllPoints()
-	RaidBossEmoteFrame:SetPoint('TOP', UIParent, 'CENTER', 0, 0)
+	RaidBossEmoteFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, 150*C.SCALE_FIX)
+	--RaidWarningFrame:ClearAllPoints()
+	--RaidWarningFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, api.scale(150))
+	--RaidWarningFrame.SetParent = api.dummy
+
 
 	-- 解除玩家框架
 	UnregisterUnitWatch(PlayerFrame)

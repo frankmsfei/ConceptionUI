@@ -191,8 +191,7 @@ hooksecurefunc('UnitPopup_OnClick', function(self)
 end)
 
 local function SetTitle(self, i)
-	SetCurrentTitle(i)
-	print('title selected')
+	return SetCurrentTitle(i)
 end
 
 local info = {}

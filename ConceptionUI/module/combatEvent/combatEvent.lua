@@ -241,6 +241,8 @@ function D.LOAD.M:LoadCombatEvent()
 		frame.spellname:SetTextColor(r, g, b)
 		frame.amount:SetText(amount)
 		frame.amount:SetTextColor(r, g, b)
+		frame.amount:SetAlphaGradient(0, frame.amount:GetWidth())
+		frame.spellname:SetAlphaGradient(0, frame.spellname:GetWidth())
 		frame[animation]:Play()
 		frame:Show()
 	end
@@ -284,7 +286,7 @@ function D.LOAD.M:LoadCombatEvent()
 		elseif unit == 'player' and CombatEvent.CHANNEL == 'PARTY' then
 			return 'PARTY'
 		else
-			return nil
+			return CombatEvent.CHANNEL
 		end
 	end
 
@@ -295,7 +297,7 @@ function D.LOAD.M:LoadCombatEvent()
 		if not unit then return end
 		if not COMMON[spellID] then return end
 		self:AddNotice(1, 1, 1, '%s > %s%s', ColoredName(unit), GetSpellIcon(spellID), spellName)
-		self:AddMessage(GetUnitChannel(unit), '%s > %s', UnitName(unit), GetSpellLink(spellID))
+		self:AddMessage(GetUnitChannel(unit), '[%s] > %s', UnitName(unit), GetSpellLink(spellID))
 		return	
 	end
 
