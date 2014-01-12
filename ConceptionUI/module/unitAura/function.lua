@@ -33,9 +33,9 @@ local function GetDispelTypeColor(dispelType)
 end
 
 local function showAura(self, icon, stack, dispelType, expiration, desaturated, debuff)
-	self.icon:SetDesaturated(desaturated)
 	self.icon.overlay:Show()
 	self.icon:SetTexture(icon)
+	self.icon:SetDesaturated(desaturated)
 	if debuff then
 		self.shadow:SetBackdropBorderColor(GetDispelTypeColor(dispelType))
 	end
@@ -164,7 +164,7 @@ function F:UNIT_TARGET(unit)
 	if unit=='focus' or unit=='targettarget' then return end
 	if unit=='player' then
 		UpdateAura(AURA['TargetBuff'], 'target', 'HELPFUL', false)
-		UpdateAura(AURA['TargetDeBuff'], 'target', 'HARMFUL')
+		UpdateAura(AURA['TargetDeBuff'], 'target', 'HARMFUL', true)
 		UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'HARMFUL', true)
 		return
 	elseif unit=='target' then
