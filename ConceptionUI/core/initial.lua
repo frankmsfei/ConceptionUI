@@ -13,7 +13,6 @@ function D.LOAD.P:Initial()
 	--RaidWarningFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, api.scale(150))
 	--RaidWarningFrame.SetParent = api.dummy
 
-
 	-- 解除玩家框架
 	UnregisterUnitWatch(PlayerFrame)
 	PlayerFrame:UnregisterAllEvents()

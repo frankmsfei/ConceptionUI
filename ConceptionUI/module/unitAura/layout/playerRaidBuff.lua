@@ -34,14 +34,13 @@ function D.LOAD.I:LoadPlayerRaidBuff()
 
 	C.AURAFRAME['PlayerRaidBuff'] = F
 
-	local T = Frame('ConceptionUI PlayerTemporarydBuff', C)
-		T:SetAlpha(cfg.alpha)
+	local T = {}
 
 	for i = 1, 2 do
-		T[i] = CreateAura('ConceptionUI PlayerTemporarydBuff', i, T)
+		T[i] = CreateAura('ConceptionUI PlayerTemporaryBuff', i, F)
 		T[i]:SetPoint('TOPLEFT', F[i], 'BOTTOMLEFT', 0, -5-cfg.gap)
 		T[i]:SetAttribute('target-slot', 15+i)
 	end
 
-	C.AURAFRAME['PlayerTemporarydBuff'] = T
+	C.AURAFRAME['PlayerTemporaryBuff'] = T
 end

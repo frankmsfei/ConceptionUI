@@ -8,6 +8,7 @@ local CORE, DATA = UI[1], UI[2]
 	CORE.FUNC = {}
 	CORE.UNITFRAME = { Major = {}, Minor = {} }
 	CORE.AURAFRAME = {}
+	CORE.UNIT = setmetatable({}, {__call = function(self, value) for unit, guid in pairs(self) do if guid == value then return unit end end end})
 	CORE.CLASS = select(2, UnitClass('player'))
 	CORE.SCALE_FIX = max(768/tonumber(GetCVar('gxResolution'):match('%d+x(%d+)')), .64)
 	CORE:SetScale(CORE.SCALE_FIX)
@@ -35,8 +36,6 @@ end
 function DATA:PLAYER_LOGIN(event)
 	local alpha = CORE:GetAttribute('fade')
 	CORE:SetAttribute('state-alpha', IsMounted() and alpha or 1)
-	CORE.PLAYER = UnitGUID('player')
-	CORE.PLAYER_NAME = UnitName('player')
 	CORE:SetScript('OnEvent', nil)
 	CORE:UnregisterEvent(event)
 	wipe(UI[2])

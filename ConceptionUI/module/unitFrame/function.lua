@@ -1,6 +1,8 @@
 local C = unpack(select(2, ...))
 	C.FUNC.UNIT = {}
 local FUNC, xp = C.FUNC.UNIT, false
+local UnitGUID = UnitGUID
+local UNIT = C.UNIT
 
 local UnitHealth, UnitHealthMax, UnitPower, UnitPowerMax, UnitIsDeadOrGhost = UnitHealth, UnitHealthMax, UnitPower, UnitPowerMax, UnitIsDeadOrGhost
 local function OnHpChanged(frame, unit)
@@ -139,7 +141,7 @@ local function NameCheck(frame, unit)
 	if not UnitExists(unit) then
 		return
 	end
-	frame.guid = UnitGUID(unit)
+	UNIT[unit] = UnitGUID(unit)
 	if not frame.target then
 		local status = (UnitIsAFK(unit) and '|cFF9E6100AFK|r') or (UnitIsDND(unit) and '|cFF9E0000DND|r') or (not UnitIsConnected(unit) and '|cFF616161DC|r') or ''
 		if unit == 'player' then
@@ -194,7 +196,7 @@ function FUNC.OnHide(frame)
 	frame.ppBar:SetValue(0)
 	frame.hpBar:SetScript('OnValueChanged', nil)
 	frame.ppBar:SetScript('OnValueChanged', nil)
-	frame.guid = nil
+	UNIT[frame:GetAttribute('unit')] = nil
 	if frame.taregt then frame.target:SetText(nil) end
 	if frame.hpInfo then frame.hpInfo:SetText(nil) end
 	if frame.ppInfo then frame.ppInfo:SetText(nil) end

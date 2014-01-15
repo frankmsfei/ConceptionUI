@@ -25,24 +25,24 @@ function D.LOAD.M:LoadCombatEvent()
 			
 			AG.fadeIn = AG:CreateAnimation('Alpha')
 			AG.fadeIn:SetChange(1)
-			AG.fadeIn:SetDuration(.2)
+			AG.fadeIn:SetDuration(.1)
 			AG.fadeIn:SetOrder(1)
 			AG.moveIn = AG:CreateAnimation('Translation')
 			AG.moveIn:SetSmoothing('OUT_IN')
-			AG.moveIn:SetDuration(.2)
+			AG.moveIn:SetDuration(.1)
 			AG.moveIn:SetOrder(1)
 
 			AG.moveStay = AG:CreateAnimation('Translation')
-			AG.moveStay:SetDuration(.5)
+			AG.moveStay:SetDuration(.4)
 			AG.moveStay:SetOrder(2)
 
 			AG.fadeOut = AG:CreateAnimation('Alpha')
 			AG.fadeOut:SetChange(-1)
-			AG.fadeOut:SetDuration(.2)
+			AG.fadeOut:SetDuration(.1)
 			AG.fadeOut:SetOrder(3)
 			AG.moveOut = AG:CreateAnimation('Translation')
 			AG.moveOut:SetSmoothing('OUT_IN')
-			AG.moveOut:SetDuration(.2)
+			AG.moveOut:SetDuration(.1)
 			AG.moveOut:SetOrder(3)
 			
 			AG.ae = 0
@@ -80,89 +80,31 @@ function D.LOAD.M:LoadCombatEvent()
 		return AG
 	end
 
-	local TargetEvent = Frame('Conception TargetEvent', C, 'LEFT', UIParent, 'CENTER', cfg.x, cfg.y, 22, 22)
-		TargetEvent:SetFrameLevel(9)
-		TargetEvent.icon = Icon(TargetEvent, 22, 'BACKGROUND')
-		TargetEvent.shadow = DropShadow(TargetEvent)
-		TargetEvent.amount = String(TargetEvent, 'LEFT', TargetEvent, 'RIGHT', 4, 0, cfg.font, cfg.fontSize, cfg.fontFlag, 1.25, -1.25)
-		TargetEvent.spellname = String(TargetEvent, 'LEFT', TargetEvent, 'RIGHT', 4, 0, cfg.spellname_font, cfg.spellname_fontSize, cfg.spellname_fontFlag, 1.25, -1.25)
+	local function CreateDisplay(parent, align1, align2, factor, sub)
+		local frame = Frame(nil, parent, align1, parent, align2, factor, -10, 20, 20)
+			frame.icon = Icon(frame, 20, 'AORWORK')
+			frame.shadow = DropShadow(frame)
+			frame.amount = String(frame, align1, frame, align2, 4*factor, 0, cfg.font, 20, cfg.fontFlag)
+			frame.spellname = String(frame, align1, frame, align2, 4*factor, 0, cfg.spellname_font, 18, cfg.spellname_fontFlag)
 
-		TargetEvent.IN = CreateAni_H(TargetEvent)
-		TargetEvent.IN.moveIni:SetOffset(-20, 0)
-		TargetEvent.IN.moveIn:SetOffset(20, 0)
-		TargetEvent.IN.moveStay:SetOffset(1, 0)
-		TargetEvent.IN.moveOut:SetOffset(20, 0)
+			frame.IN = CreateAni_H(frame)
+			frame.IN.moveIni:SetOffset(10*factor, 0)
+			frame.IN.moveIn:SetOffset(-10*factor, 0)
+			frame.IN.moveStay:SetOffset(-2*factor, 0)
+			frame.IN.moveOut:SetOffset(-10*factor, 0)
+			frame.OUT = CreateAni_H(frame)
+			frame.OUT.moveIni:SetOffset(-10*factor, 0)
+			frame.OUT.moveIn:SetOffset(10*factor, 0)
+			frame.OUT.moveStay:SetOffset(2*factor, 0)
+			frame.OUT.moveOut:SetOffset(10*factor, 0)
+			if sub then
+				frame:SetScale(.8)
+				frame:SetPoint(align1, parent, align2, 20*factor, -50)
+			end
+			frame:Hide()
+		return frame
+	end
 
-		TargetEvent.OUT = CreateAni_H(TargetEvent)
-		TargetEvent.OUT.moveIni:SetOffset(20, 0)
-		TargetEvent.OUT.moveIn:SetOffset(-20, 0)
-		TargetEvent.OUT.moveStay:SetOffset(-1, 0)
-		TargetEvent.OUT.moveOut:SetOffset(-20, 0)
-
-		TargetEvent:Hide()
-
-	local TargetSubEvent = Frame('Conception TargetSubEvent', C, 'TOPLEFT', TargetEvent, 'BOTTOMLEFT', 10, -10, 20, 20)
-		TargetSubEvent:SetFrameLevel(9)
-		TargetSubEvent.icon = Icon(TargetSubEvent, 20, 'BACKGROUND')
-		TargetSubEvent.shadow = DropShadow(TargetSubEvent)
-		TargetSubEvent.amount = String(TargetSubEvent, 'LEFT', TargetSubEvent, 'RIGHT', 3, 0, cfg.font, .8*cfg.fontSize, cfg.fontFlag, 1, -1)
-		TargetSubEvent.spellname = String(TargetSubEvent, 'LEFT', TargetSubEvent, 'RIGHT', 3, 0, cfg.spellname_font, .8*cfg.spellname_fontSize, cfg.spellname_fontFlag, 1, -1)
-
-		TargetSubEvent.IN = CreateAni_H(TargetSubEvent)
-		TargetSubEvent.IN.moveIni:SetOffset(-16, 0)
-		TargetSubEvent.IN.moveIn:SetOffset(16, 0)
-		TargetSubEvent.IN.moveStay:SetOffset(2, 0)
-		TargetSubEvent.IN.moveOut:SetOffset(16, 0)
-
-		TargetSubEvent.OUT = CreateAni_H(TargetSubEvent)
-		TargetSubEvent.OUT.moveIni:SetOffset(16, 0)
-		TargetSubEvent.OUT.moveIn:SetOffset(-16, 0)
-		TargetSubEvent.OUT.moveStay:SetOffset(-2, 0)
-		TargetSubEvent.OUT.moveOut:SetOffset(-16, 0)
-
-		TargetSubEvent:Hide()
-
-	local PlayerEvent = Frame('Conception PlayerEvent', C, 'RIGHT', UIParent, 'CENTER', -cfg.x, cfg.y, 22, 22)
-		PlayerEvent:SetFrameLevel(9)
-		PlayerEvent.icon = Icon(PlayerEvent, 22, 'BACKGROUND')
-		PlayerEvent.shadow = DropShadow(PlayerEvent)
-		PlayerEvent.amount = String(PlayerEvent, 'RIGHT', PlayerEvent.icon, 'LEFT', -4, 0, cfg.font, cfg.fontSize, cfg.fontFlag, -1.25, -1.25)
-		PlayerEvent.spellname = String(PlayerEvent, 'RIGHT', PlayerEvent.icon, 'LEFT', -4, 0, cfg.spellname_font, cfg.spellname_fontSize, cfg.spellname_fontFlag, -1.25, -1.25)
-
-		PlayerEvent.IN = CreateAni_H(PlayerEvent)
-		PlayerEvent.IN.moveIni:SetOffset(20, 0)
-		PlayerEvent.IN.moveIn:SetOffset(-20, 0)
-		PlayerEvent.IN.moveStay:SetOffset(-2, 0)
-		PlayerEvent.IN.moveOut:SetOffset(-20, 0)
-
-		PlayerEvent.OUT = CreateAni_H(PlayerEvent)
-		PlayerEvent.OUT.moveIni:SetOffset(-20, 0)
-		PlayerEvent.OUT.moveIn:SetOffset(20, 0)
-		PlayerEvent.OUT.moveStay:SetOffset(2, 0)
-		PlayerEvent.OUT.moveOut:SetOffset(20, 0)
-
-		PlayerEvent:Hide()
-
-	local PlayerSubEvent = Frame('Conception PlayerSubEvent', C, 'TOPRIGHT', PlayerEvent, 'BOTTOMRIGHT', -10, -10, 20, 20)
-		PlayerSubEvent:SetFrameLevel(9)
-		PlayerSubEvent.icon = Icon(PlayerSubEvent, 20, 'BACKGROUND')
-		PlayerSubEvent.shadow = DropShadow(PlayerSubEvent)
-		PlayerSubEvent.amount = String(PlayerSubEvent, 'RIGHT', PlayerSubEvent.icon, 'LEFT', -3, 0, cfg.font, .8*cfg.fontSize, cfg.fontFlag, -1, -1)
-		PlayerSubEvent.spellname = String(PlayerSubEvent, 'RIGHT', PlayerSubEvent.icon, 'LEFT', -3, 0, cfg.spellname_font, .8*cfg.spellname_fontSize, cfg.spellname_fontFlag, -1, -1)
-
-		PlayerSubEvent.IN = CreateAni_H(PlayerSubEvent)
-		PlayerSubEvent.IN.moveIni:SetOffset(16, 0)
-		PlayerSubEvent.IN.moveIn:SetOffset(-16, 0)
-		PlayerSubEvent.IN.moveStay:SetOffset(-2, 0)
-		PlayerSubEvent.IN.moveOut:SetOffset(-16, 0)
-
-		PlayerSubEvent.OUT = CreateAni_H(PlayerSubEvent)
-		PlayerSubEvent.OUT.moveIni:SetOffset(-16, 0)
-		PlayerSubEvent.OUT.moveIn:SetOffset(16, 0)
-		PlayerSubEvent.OUT.moveStay:SetOffset(2, 0)
-		PlayerSubEvent.OUT.moveOut:SetOffset(16, 0)
-
-		PlayerSubEvent:Hide()
 --[[
 	local function CreateScroll(frame, i)
 		local line = 'line'..i
@@ -193,10 +135,35 @@ function D.LOAD.M:LoadCombatEvent()
 		CombatEvent:RegisterEvent('PLAYER_LOGIN')
 		CombatEvent:SetScript('OnEvent', function(self, event, ...) self[event](self, ...) end)
 		CombatEvent:Hide()
-		CombatEvent.TargetEvent = TargetEvent
-		CombatEvent.PlayerEvent = PlayerEvent
-		CombatEvent.TargetSubEvent = TargetSubEvent
-		CombatEvent.PlayerSubEvent = PlayerSubEvent
+		CombatEvent.EVENT_FRAMES = {}
+		for i = 1, 2 do
+			CombatEvent.EVENT_FRAMES['player'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 1)
+			CombatEvent.EVENT_FRAMES['playersub'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 1, true)
+			CombatEvent.EVENT_FRAMES['focus'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 1)
+			CombatEvent.EVENT_FRAMES['focussub'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 1, true)
+			CombatEvent.EVENT_FRAMES['target'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', -1)
+			CombatEvent.EVENT_FRAMES['targetsub'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', -1, true)
+			CombatEvent.EVENT_FRAMES['targettarget'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -1)
+			CombatEvent.EVENT_FRAMES['targettargetsub'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -1, true)
+		end
+
+	local GetSpellTexture = GetSpellTexture
+	local function GetSpellIcon(spellID)
+		return ('|T%s:0|t'):format(GetSpellTexture(spellID))
+	end
+	CombatEvent.GetSpellIcon = GetSpellIcon
+
+	function CombatEvent:GetUnitChannel(unit)
+		if unit:match('raid%d') then
+			return CombatEvent.CHANNEL
+		elseif unit:match('party%d') and CombatEvent.CHANNEL == 'PARTY' then
+			return 'PARTY'
+		elseif unit == 'player' and CombatEvent.CHANNEL == 'PARTY' then
+			return 'PARTY'
+		else
+			return nil
+		end
+	end
 
 	local SendChatMessage = SendChatMessage
 	function CombatEvent:AddMessage(channel, text, ...)
@@ -232,27 +199,34 @@ function D.LOAD.M:LoadCombatEvent()
 		end
 	end
 ]]
-	function CombatEvent:Display(frame, animation, iconID, spellname, amount, r, g, b)
-		frame = CombatEvent[frame]
-		frame:Hide()
-		frame[animation]:Stop()
-		frame.icon:SetTexture(GetSpellTexture(iconID))
-		frame.spellname:SetText(spellname)
-		frame.spellname:SetTextColor(r, g, b)
-		frame.amount:SetText(amount)
-		frame.amount:SetTextColor(r, g, b)
-		frame.amount:SetAlphaGradient(0, frame.amount:GetWidth())
-		frame.spellname:SetAlphaGradient(0, frame.spellname:GetWidth())
-		frame[animation]:Play()
-		frame:Show()
+	function CombatEvent:Display(unit, animation, iconID, spellname, amount, r, g, b)
+		if not unit then return end
+		local current_frame, next_frame = nil, nil
+		for i = 1, 2 do
+			current_frame = self.EVENT_FRAMES[unit..i]
+			if current_frame[animation]:IsPlaying() then
+				current_frame:SetFrameLevel(9)
+				next_frame = self.EVENT_FRAMES[unit..(3-i)]
+			end
+			frame = next_frame or current_frame
+			frame:Hide()
+			frame[animation]:Stop()
+			frame.icon:SetTexture(GetSpellTexture(iconID))
+			frame.spellname:SetText(spellname)
+			frame.spellname:SetTextColor(r, g, b)
+			frame.amount:SetText(amount)
+			frame.amount:SetTextColor(r, g, b)
+			frame:SetFrameLevel(10)
+			frame[animation]:Play()
+			frame:Show()
+			return
+		end
 	end
-
 
 	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(_, combatEvent, _, sourceGUID, sourceName, _, _, destGUID, ...)
-		if (sourceGUID ~= self.PLAYER) and (destGUID ~= self.PLAYER) then return end
+		if (sourceGUID ~= self.PLAYER_GUID) and (destGUID ~= self.PLAYER_GUID) then return end
 		self.CLEU[combatEvent](self, sourceGUID, sourceName, _, _, destGUID, ...)
 	end
-
 
 	local collectgarbage, SetCVar = collectgarbage, SetCVar
 	function CombatEvent:PLAYER_REGEN_DISABLED()
@@ -263,30 +237,13 @@ function D.LOAD.M:LoadCombatEvent()
 			SetCVar('nameplateShowFriends', 0)
 		end
 	end
+
 	function CombatEvent:PLAYER_REGEN_ENABLED()
 		self:UnregisterEvent('PLAYER_REGEN_ENABLED')
 		self:RegisterEvent('PLAYER_REGEN_DISABLED')
 		self:AddNotice(0, 1, 0, '- COMBAT -')
 		if self.HideFriendlyNameplatesInCombat then
 			SetCVar('nameplateShowFriends', 1)
-		end
-	end
-
-	local GetSpellTexture = GetSpellTexture
-	local function GetSpellIcon(spellID)
-		return ('|T%s:0|t'):format(GetSpellTexture(spellID))
-	end
-	CombatEvent.GetSpellIcon = GetSpellIcon
-
-	local function GetUnitChannel(unit)
-		if unit:match('raid%d') then
-			return CombatEvent.CHANNEL
-		elseif unit:match('party%d') and CombatEvent.CHANNEL == 'PARTY' then
-			return 'PARTY'
-		elseif unit == 'player' and CombatEvent.CHANNEL == 'PARTY' then
-			return 'PARTY'
-		else
-			return CombatEvent.CHANNEL
 		end
 	end
 
@@ -297,7 +254,7 @@ function D.LOAD.M:LoadCombatEvent()
 		if not unit then return end
 		if not COMMON[spellID] then return end
 		self:AddNotice(1, 1, 1, '%s > %s%s', ColoredName(unit), GetSpellIcon(spellID), spellName)
-		self:AddMessage(GetUnitChannel(unit), '[%s] > %s', UnitName(unit), GetSpellLink(spellID))
+		self:AddMessage(self:GetUnitChannel(unit), '[%s] > %s', UnitName(unit), GetSpellLink(spellID))
 		return	
 	end
 
@@ -327,7 +284,7 @@ function D.LOAD.M:LoadCombatEvent()
 		self:RegisterEvent('PLAYER_REGEN_DISABLED')
 		self:RegisterEvent('GROUP_ROSTER_UPDATE')
 		self:UnregisterEvent('PLAYER_LOGIN')
-		self.PLAYER = C.PLAYER
+		self.PLAYER_GUID = UnitGUID('player')
 		self.HideFriendlyNameplatesInCombat = ConceptionCFG['HideFriendlyNameplatesInCombat']
 		self:GROUP_ROSTER_UPDATE()
 	end

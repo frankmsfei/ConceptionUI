@@ -125,7 +125,7 @@ end
 
 local GetTime, pairs = GetTime, pairs
 local function OnUpdate(self, elapsed)
-	self.elapsed = elapsed + (self.elapsed or 0)
+	--self.elapsed = elapsed + (self.elapsed or 0)
 	--if self.elapsed < .1 then return end
 	--self.elapsed = 0
 	local now = GetTime()
@@ -133,7 +133,7 @@ local function OnUpdate(self, elapsed)
 		UpdateTimer(v, now)
 	end
 	UpdateAura(AURA['TargetTargetDeBuff'], 'targettarget', 'HARMFUL', true)
-	UpdateEnchant(AURA['PlayerTemporarydBuff'], now)
+	UpdateEnchant(AURA['PlayerTemporaryBuff'], now)
 end
 
 local VALID = {['player']=true, ['target']=true, ['focus']=true, ['targettarget']=true}
