@@ -34,12 +34,6 @@ function NAMEPLATE:Skin(plate)
 		healthbar:SetSize(plate_width, healthbar_height)
 		healthbar:SetPoint('CENTER', plate, 'CENTER')
 		plate.healthbar = healthbar
-		
-	local castbar = CreateFrame('StatusBar', nil, plate)
-		castbar:SetStatusBarTexture(texture)
-		castbar:SetSize(plate_width, castbar_height)
-		castbar:SetPoint('TOP', healthbar, 'BOTTOM', 0, -bar_gap)
-		castbar:Hide()
 
 	local bg = CreateFrame('Frame', nil, healthbar)
 		bg:SetBackdrop(backdrop)
@@ -49,6 +43,15 @@ function NAMEPLATE:Skin(plate)
 		bg:SetBackdropColor(0, 0, 0, 0)
 		bg:SetBackdropBorderColor(0, 0, 0, 0)
 		plate.bg = bg
+
+	local castbar = CreateFrame('StatusBar', nil, plate)
+		castbar:SetStatusBarTexture(texture)
+		castbar:SetSize(plate_width, castbar_height)
+		castbar:SetPoint('TOP', healthbar, 'BOTTOM', 0, -bar_gap)
+		castbar.bg = castbar:CreateTexture(nil, 'BACKGROUND')
+		castbar.bg:SetTexture(0, 0, 0, 1)
+		castbar.bg:SetAllPoints(castbar)
+		castbar:Hide()
 
 	local id = plate:CreateFontString()
 		id:SetFont(name_font, name_size, 'THINOUTLINE')

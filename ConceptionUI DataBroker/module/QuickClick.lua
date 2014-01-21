@@ -32,8 +32,6 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 					return
 				end
 			end
-		elseif button == 'MiddleButton' then
-			return ToggleMinimap()
 		end
 	end,
  	OnTooltipShow = function(tip)
@@ -47,7 +45,6 @@ LibStub('LibDataBroker-1.1'):NewDataObject('QuickClick', {
 		tip:AddLine('\nCommon', .62, .62, 0)
 		tip:AddDoubleLine('Toggle Sound Effect', '[L]', .38, .38, .38, .62, .38, 0)
 		tip:AddDoubleLine('Toggle Macro Frame', '[R]', .38, .38, .38, 0, .38, .62)
-		tip:AddDoubleLine('Toggle Minimap', '[M]', .38, .38, .38, .19, .62, .19)
 		if IsAddOnLoaded('!AWP') then
 			tip:AddLine('\nAddOn Profiles', .62, .62, 0)
 			tip:AddDoubleLine('Basic', 'ALT+[L]', .38, .38, .38, .62, .38, 0)

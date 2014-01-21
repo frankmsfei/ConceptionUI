@@ -82,27 +82,23 @@ function MENU.initialize(self)
 	end
 end
 
-hooksecurefunc('UnitPopup_ShowMenu', function(dropdownMenu, which, unit, name, userData)
-	if which == 'SELF' then
-		if UIDROPDOWNMENU_INIT_MENU.which == 'EQUIP_MENU' then
-			for i = 1, GetNumEquipmentSets() do
-				local set, icon = GetEquipmentSetInfo(i)
-				MENU.info.text = ('|T%s:14:14:0:-1:48:48:5:44:5:44|t %s%s|r'):format(icon, Equip.pending and Equip.pending == set and '|cFF9E0000' or '', set)
-				MENU.info.arg1 = set
-				MENU.info.func = OnSelect
-				MENU.info.checked = Located(set)
-				UIDropDownMenu_AddButton(MENU.info, 2)
-				wipe(MENU.info)
-			end
-		end
+
+
+local function ShowEquipMenu(dropdownMenu, which, unit, name, userData)
+	if which ~= 'SELF' then return end
+	if UIDROPDOWNMENU_INIT_MENU.which ~= 'EQUIP_MENU' then return end
+	for i = 1, GetNumEquipmentSets() do
+		local set, icon = GetEquipmentSetInfo(i)
+		MENU.info.text = ('|T%s:14:14:0:-1:48:48:5:44:5:44|t %s%s|r'):format(icon, Equip.pending and Equip.pending == set and '|cFF9E0000' or '', set)
+		MENU.info.arg1 = set
+		MENU.info.func = OnSelect
+		MENU.info.checked = Located(set)
+		UIDropDownMenu_AddButton(MENU.info, 2)
+		wipe(MENU.info)
 	end
-end)
+end
+hooksecurefunc('UnitPopup_ShowMenu', ShowEquipMenu)
 
 UnitPopupButtons['EQUIP_MENU'] = {text = EQUIPSET_EQUIP, dist = 0, nested = 1}
 UnitPopupMenus['EQUIP_MENU'] = {}
-
-for k, v in ipairs(UnitPopupMenus['SELF']) do
-	if v == 'CANCEL' then
-		return table.insert(UnitPopupMenus['SELF'], k, 'EQUIP_MENU')
-	end
-end
+table.insert(UnitPopupMenus['SELF'], 1, 'EQUIP_MENU')

@@ -102,7 +102,6 @@ NAMEPLATE.CheckColor = function(self)
 end
 
 NAMEPLATE.UpdateColor = function(self, r, g, b, a)
-	--a = a
 	self.id:SetTextColor(r, g, b, 1)
 	self.healthbar:SetStatusBarColor(r, g, b, a)
 	self.bg:SetBackdropColor(0, 0, 0, a)

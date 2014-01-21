@@ -51,7 +51,27 @@ function D.LOAD.M:LoadCombatEvent()
 		return AG
 	end
 
-	local function CreateAni_V(frame)
+	local function CreateAni_FADE(frame)
+		local AG = frame:CreateAnimationGroup()
+			AG.fadeIni = AG:CreateAnimation('Alpha')
+			AG.fadeIni:SetChange(-1)
+			AG.fadeIni:SetDuration(0)
+			AG.fadeIni:SetOrder(0)
+			AG.fadeIn = AG:CreateAnimation('Alpha')
+			AG.fadeIn:SetChange(1)
+			AG.fadeIn:SetDuration(.2)
+			AG.fadeIn:SetOrder(1)
+			AG.fadeOut = AG:CreateAnimation('Alpha')
+			AG.fadeOut:SetStartDelay(.5)
+			AG.fadeOut:SetChange(-1)
+			AG.fadeOut:SetDuration(.3)
+			AG.fadeOut:SetOrder(2)
+			AG.parent = frame
+			AG:SetScript('OnFinished', Finished)
+		return AG
+	end
+
+	local function CreateAni_Scroll(frame)
 		local AG = frame:CreateAnimationGroup()
 			AG.fadeIni = AG:CreateAnimation('Alpha')
 			AG.fadeIni:SetChange(-1)
@@ -74,19 +94,19 @@ function D.LOAD.M:LoadCombatEvent()
 			AG.fadeOut:SetStartDelay(.8)
 			AG.fadeOut:SetChange(-1)
 			AG.fadeOut:SetDuration(.2)
-			AG.fadeOut:SetOrder(1)
+			AG.fadeOut:SetOrder(2)
 			AG.parent = frame
 			AG:SetScript('OnFinished', Finished)
 		return AG
 	end
 
-	local function CreateDisplay(parent, align1, align2, factor, sub)
-		local frame = Frame(nil, parent, align1, parent, align2, factor, -10, 20, 20)
-			frame.icon = Icon(frame, 20, 'AORWORK')
+	local function CreateDisplay(parent, align1, align2, x, y, factor, scale)
+		local frame = Frame(nil, parent, align1, parent, align2, x*factor, y, 20, 20)
+			frame:SetScale(scale)
+			frame.icon = Icon(frame, 20, 'ARTWORK')
 			frame.shadow = DropShadow(frame)
 			frame.amount = String(frame, align1, frame, align2, 4*factor, 0, cfg.font, 20, cfg.fontFlag)
 			frame.spellname = String(frame, align1, frame, align2, 4*factor, 0, cfg.spellname_font, 18, cfg.spellname_fontFlag)
-
 			frame.IN = CreateAni_H(frame)
 			frame.IN.moveIni:SetOffset(10*factor, 0)
 			frame.IN.moveIn:SetOffset(-10*factor, 0)
@@ -97,15 +117,32 @@ function D.LOAD.M:LoadCombatEvent()
 			frame.OUT.moveIn:SetOffset(10*factor, 0)
 			frame.OUT.moveStay:SetOffset(2*factor, 0)
 			frame.OUT.moveOut:SetOffset(10*factor, 0)
-			if sub then
-				frame:SetScale(.8)
-				frame:SetPoint(align1, parent, align2, 20*factor, -50)
-			end
 			frame:Hide()
 		return frame
 	end
 
---[[
+	local function UpdateNotification(self, elapsed)
+		local a, b, c, x, y = self:GetPoint()
+		self:SetPoint(a, b, c, x, .1+y)
+	end
+
+	local function ResetNotification(self)
+		self:SetPoint('BOTTOM', UIParent, 'CENTER', 0, self.offset)
+	end
+
+	local function CreateNotification(offset)
+		local frame = Frame(nil, C)
+			frame:SetSize(1,1)
+			frame.offset = offset
+			frame.text = String(frame, 'CENTER', frame, 'CENTER', 0, 0, cfg.spellname_font, 16, cfg.spellname_fontFlag)
+			frame.FADE = CreateAni_FADE(frame)
+			frame:SetScript('OnUpdate', UpdateNotification)
+			frame:SetScript('OnShow', ResetNotification)
+			frame:Hide()
+		return frame
+	end
+
+	--[[
 	local function CreateScroll(frame, i)
 		local line = 'line'..i
 		frame[line] = Frame(nil, C, 'CENTER', UIParent, 'CENTER', 0, 0, 16, 16)
@@ -130,21 +167,22 @@ function D.LOAD.M:LoadCombatEvent()
 		TargetEvent[line].amount:ClearAllPoints()
 		TargetEvent[line].amount:SetPoint('LEFT', TargetEvent[line].icon, 'RIGHT', 2, 0)
 	end
-]]
+	]]
 	local CombatEvent = CreateFrame('Frame', 'CombatEvent', C)
 		CombatEvent:RegisterEvent('PLAYER_LOGIN')
 		CombatEvent:SetScript('OnEvent', function(self, event, ...) self[event](self, ...) end)
 		CombatEvent:Hide()
 		CombatEvent.EVENT_FRAMES = {}
-		for i = 1, 2 do
-			CombatEvent.EVENT_FRAMES['player'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 1)
-			CombatEvent.EVENT_FRAMES['playersub'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 1, true)
-			CombatEvent.EVENT_FRAMES['focus'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 1)
-			CombatEvent.EVENT_FRAMES['focussub'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 1, true)
-			CombatEvent.EVENT_FRAMES['target'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', -1)
-			CombatEvent.EVENT_FRAMES['targetsub'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', -1, true)
-			CombatEvent.EVENT_FRAMES['targettarget'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -1)
-			CombatEvent.EVENT_FRAMES['targettargetsub'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -1, true)
+		for i = 1, 3 do
+			CombatEvent.EVENT_FRAMES['player'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 11*(i-1), -11, 1, 1)
+			CombatEvent.EVENT_FRAMES['playersub'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 11*(i-1)+10, -62, 1, .8)
+			CombatEvent.EVENT_FRAMES['target'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 11*(i-1), -11, -1, 1)
+			CombatEvent.EVENT_FRAMES['targetsub'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 11*(i-1)+10, -62, -1, .8)
+			CombatEvent.EVENT_FRAMES['focus'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 11*(i-1), -10, 1, .8)
+			CombatEvent.EVENT_FRAMES['focussub'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', -11*(i-1)+10, -56, 1, .8)
+			CombatEvent.EVENT_FRAMES['targettarget'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', 11*(i-1), -10, -1, .8)
+			CombatEvent.EVENT_FRAMES['targettargetsub'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -11*(i-1)+10, -56, -1, .8)
+			CombatEvent.EVENT_FRAMES['notification'..i] = CreateNotification(140-(10*i))
 		end
 
 	local GetSpellTexture = GetSpellTexture
@@ -171,17 +209,34 @@ function D.LOAD.M:LoadCombatEvent()
 		SendChatMessage(text:format(...), channel, nil)
 	end
 
-	local NoticeColor = {r = 1, g = 1, b = 1}
-	local RaidNotice_AddMessage, RaidBossEmoteFrame = RaidNotice_AddMessage, RaidBossEmoteFrame
 	function CombatEvent:AddNotice(r, g, b, text, ...)
-		NoticeColor.r = r
-		NoticeColor.g = g
-		NoticeColor.b = b
-		RaidBossEmoteFrame.slot1.fadeOutTime = .5
-		RaidBossEmoteFrame.slot2.fadeOutTime = .5
-		RaidNotice_AddMessage(RaidBossEmoteFrame, text:format(...), NoticeColor, 1)
+		--[[local current_frame, next_frame = nil, nil
+		for i = 1, 3 do
+			current_frame = self.EVENT_FRAMES['notification'..i]
+			if current_frame:IsShown() then
+				current_frame:SetFrameLevel(self:GetFrameLevel()-1)
+				current_frame:SetAlpha(self:GetAlpha()*.33)
+				if i ~= 3 then
+					next_frame = self.EVENT_FRAMES['notification'..(1+i)]
+				else
+					next_frame = self.EVENT_FRAMES['notification1']
+				end
+			else
+				break
+			end
+		end
+		frame = next_frame or current_frame]]
+		local frame = self:GetNextDisplay('notification')
+		frame:Hide()
+		frame['FADE']:Stop()
+		frame.text:SetText(text:format(...))
+		frame.text:SetTextColor(r, g, b)
+		frame:SetFrameLevel(11)
+		frame:SetAlpha(1)
+		frame['FADE']:Play()
+		frame:Show()
 	end
---[[
+	--[[
 	local GetSpellTexture = GetSpellTexture
 	local function DisplayScroll(line, icon, text, r, g, b)
 		if line.UP:IsPlaying() then return end
@@ -198,34 +253,42 @@ function D.LOAD.M:LoadCombatEvent()
 			DisplayScroll(frame['line'..i], GetSpellTexture(iconID), text, r, g, b)
 		end
 	end
-]]
-	function CombatEvent:Display(unit, animation, iconID, spellname, amount, r, g, b)
-		if not unit then return end
-		local current_frame, next_frame = nil, nil
-		for i = 1, 2 do
-			current_frame = self.EVENT_FRAMES[unit..i]
-			if current_frame[animation]:IsPlaying() then
-				current_frame:SetFrameLevel(9)
-				next_frame = self.EVENT_FRAMES[unit..(3-i)]
+	]]
+
+	function CombatEvent:GetNextDisplay(unit)
+		local frame, counter = nil, nil
+		for i = 1, 3 do
+			frame = self.EVENT_FRAMES[unit..i]
+			counter = i
+			if not frame:IsShown() then
+				break
+			else
+				frame:SetFrameLevel(8+i)
+				frame:SetAlpha(.33)
 			end
-			frame = next_frame or current_frame
-			frame:Hide()
-			frame[animation]:Stop()
-			frame.icon:SetTexture(GetSpellTexture(iconID))
-			frame.spellname:SetText(spellname)
-			frame.spellname:SetTextColor(r, g, b)
-			frame.amount:SetText(amount)
-			frame.amount:SetTextColor(r, g, b)
-			frame:SetFrameLevel(10)
-			frame[animation]:Play()
-			frame:Show()
-			return
 		end
+		return self.EVENT_FRAMES[unit..(counter==3 and 1 or counter)]
 	end
 
-	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(_, combatEvent, _, sourceGUID, sourceName, _, _, destGUID, ...)
-		if (sourceGUID ~= self.PLAYER_GUID) and (destGUID ~= self.PLAYER_GUID) then return end
-		self.CLEU[combatEvent](self, sourceGUID, sourceName, _, _, destGUID, ...)
+	function CombatEvent:Display(unit, animation, iconID, spellname, amount, r, g, b)
+		if not unit then return end
+		local frame = self:GetNextDisplay(unit)
+		frame:Hide()
+		frame[animation]:Stop()
+		frame.icon:SetTexture(GetSpellTexture(iconID))
+		frame.spellname:SetText(spellname)
+		frame.spellname:SetTextColor(r, g, b)
+		frame.amount:SetText(amount)
+		frame.amount:SetTextColor(r, g, b)
+		frame:SetFrameLevel(11)
+		frame:SetAlpha(1)
+		frame[animation]:Play()
+		frame:Show()
+	end
+
+	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(timeStamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, ...)
+		if (sourceGUID ~= C.UNIT['player']) and (destGUID ~= C.UNIT['player']) then return end
+		self.CLEU[combatEvent](self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, ...)
 	end
 
 	local collectgarbage, SetCVar = collectgarbage, SetCVar
@@ -258,6 +321,14 @@ function D.LOAD.M:LoadCombatEvent()
 		return	
 	end
 
+	function CombatEvent:ITEM_PUSH(bagID, itemIcon)
+		self:AddNotice(1, 1, 1, ('|T%s:0|t'):format(itemIcon))
+	end
+
+	function CombatEvent:UI_INFO_MESSAGE(...)
+		self:AddNotice(1, 1, 0, ...)
+	end
+
 	local IsInGroup, IsInRaid = IsInGroup, IsInRaid
 	local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
 	function CombatEvent:GROUP_ROSTER_UPDATE()
@@ -283,8 +354,9 @@ function D.LOAD.M:LoadCombatEvent()
 		self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED')
 		self:RegisterEvent('PLAYER_REGEN_DISABLED')
 		self:RegisterEvent('GROUP_ROSTER_UPDATE')
+		self:RegisterEvent('UI_INFO_MESSAGE')
+		self:RegisterEvent('ITEM_PUSH')
 		self:UnregisterEvent('PLAYER_LOGIN')
-		self.PLAYER_GUID = UnitGUID('player')
 		self.HideFriendlyNameplatesInCombat = ConceptionCFG['HideFriendlyNameplatesInCombat']
 		self:GROUP_ROSTER_UPDATE()
 	end

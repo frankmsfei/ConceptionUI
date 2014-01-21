@@ -1,13 +1,30 @@
 local C, D = unpack(select(2,...))
-
+function GetMinimapShape() return 'SQUARE' end
 function D.LOAD.M:SkinMinimap()
-	--LoadAddOn('Minimap')
-	function GetMinimapShape() return 'SQUARE' end
 	Minimap:EnableMouse(true)
 	Minimap:ClearAllPoints()
 	Minimap:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', -10, -10)
 	Minimap:SetMaskTexture([[Interface\Buttons\WHITE8x8]])
 	Minimap:SetSize(128, 128)
+
+	Minimap.Overlay = Minimap:CreateTexture(nil, 'BORDER')
+	Minimap.Overlay:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', 0, 0)
+	Minimap.Overlay:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 0, 0)
+	Minimap.Overlay:SetTexture(D.MEDIA.TEXTURE.buttonOverlay)
+	Minimap.Overlay:SetVertexColor(0, 0, 0, 1)
+
+	MiniMapMailFrame:ClearAllPoints()
+	MiniMapMailFrame:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 7, -7)
+	MiniMapMailIcon:SetTexture('Interface\\MINIMAP\\TRACKING\\Mailbox')
+	MiniMapMailBorder:Hide()
+
+	QueueStatusMinimapButton:ClearAllPoints()
+	QueueStatusMinimapButton:SetPoint('BOTTOMLEFT', Minimap, -7, -7)
+	QueueStatusMinimapButton:Show()
+
+	MiniMapRecordingButton:ClearAllPoints()
+	MiniMapRecordingButton:SetPoint('BOTTOMLEFT', Minimap, -7, 7)
+
 
 	MinimapBackdrop:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', -5, 5)
 	MinimapBackdrop:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 5, -5)
@@ -28,33 +45,7 @@ function D.LOAD.M:SkinMinimap()
 	MinimapBackdrop:RegisterEvent('CALENDAR_EVENT_ALARM')
 	MinimapBackdrop:SetScript('OnEvent', OnCalendarUpdate)
 
-	Minimap.Overlay = Minimap:CreateTexture(nil, 'BORDER')
-	Minimap.Overlay:SetPoint('TOPLEFT', Minimap, 'TOPLEFT', 0, 0)
-	Minimap.Overlay:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 0, 0)
-	Minimap.Overlay:SetTexture(D.MEDIA.TEXTURE.buttonOverlay)
-	Minimap.Overlay:SetVertexColor(0, 0, 0, 1)
 
-	MiniMapInstanceDifficulty:ClearAllPoints()
-	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
-
-	MiniMapChallengeMode:ClearAllPoints()
-	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 2, 1)
-
-	GuildInstanceDifficulty:ClearAllPoints()
-	GuildInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
-
-	MiniMapMailFrame:ClearAllPoints()
-	MiniMapMailFrame:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMRIGHT', 7, -7)
-	MiniMapMailIcon:SetTexture('Interface\\MINIMAP\\TRACKING\\Mailbox')
-	MiniMapMailBorder:Hide()
-
-	QueueStatusMinimapButton:ClearAllPoints()
-	QueueStatusMinimapButton:SetPoint('BOTTOMLEFT', Minimap, -7, -7)
-	QueueStatusMinimapButton:Show()
-
-	MiniMapRecordingButton:ClearAllPoints()
-	MiniMapRecordingButton:SetPoint('BOTTOMLEFT', Minimap, -7, 7)
-	
 	MinimapZoneTextButton:SetParent(Minimap)
 	MinimapZoneTextButton:ClearAllPoints()
 	MinimapZoneTextButton:SetPoint('TOPRIGHT', Minimap, 'BOTTOMRIGHT', 10, -5)
@@ -79,6 +70,14 @@ function D.LOAD.M:SkinMinimap()
 	MinimapCluster:RegisterEvent('PLAYER_ENTERING_WORLD')
 	MinimapCluster:HookScript('OnEvent', UpdateZoneText)
 
+
+	MiniMapInstanceDifficulty:ClearAllPoints()
+	MiniMapInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 7, 7)
+	MiniMapChallengeMode:ClearAllPoints()
+	MiniMapChallengeMode:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 2, 1)
+	GuildInstanceDifficulty:ClearAllPoints()
+	GuildInstanceDifficulty:SetPoint('TOPRIGHT', Minimap, 'TOPRIGHT', 4, 7)
+
 	local function ShowGuildTabard()
 		if not MiniMapInstanceDifficulty:IsShown() and not MiniMapChallengeMode:IsShown() and not GuildInstanceDifficulty:IsShown() then
 			SetSmallGuildTabardTextures('player', GuildInstanceDifficulty.emblem, GuildInstanceDifficulty.background, GuildInstanceDifficulty.border)
@@ -89,6 +88,12 @@ function D.LOAD.M:SkinMinimap()
 		end
 	end
 	hooksecurefunc('MiniMapInstanceDifficulty_Update', ShowGuildTabard)
+
+
+	GuildInstanceDifficulty.Button = CreateFrame('Button', nil, GuildInstanceDifficulty)
+	GuildInstanceDifficulty.Button:SetAllPoints()
+	GuildInstanceDifficulty.Button:SetScript('OnClick', ToggleMinimap)
+
 
 	do -- Hide Obj
 		LoadAddOn('Blizzard_TimeManager')
@@ -103,6 +108,7 @@ function D.LOAD.M:SkinMinimap()
 		MiniMapTracking:Hide()
 		GameTimeFrame:Hide()
 	end
+
 
 	local function OnMouseWheel(self, delta)
 		if delta > 0 then Minimap_ZoomIn() else Minimap_ZoomOut() end

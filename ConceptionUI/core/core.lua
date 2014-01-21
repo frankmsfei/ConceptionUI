@@ -8,7 +8,7 @@ local CORE, DATA = UI[1], UI[2]
 	CORE.FUNC = {}
 	CORE.UNITFRAME = { Major = {}, Minor = {} }
 	CORE.AURAFRAME = {}
-	CORE.UNIT = setmetatable({}, {__call = function(self, value) for unit, guid in pairs(self) do if guid == value then return unit end end end})
+	CORE.UNIT = {}
 	CORE.CLASS = select(2, UnitClass('player'))
 	CORE.SCALE_FIX = max(768/tonumber(GetCVar('gxResolution'):match('%d+x(%d+)')), .64)
 	CORE:SetScale(CORE.SCALE_FIX)

@@ -23,6 +23,7 @@ function D.LOAD.I:LoadCombatEventCFG()
 			[128275] = true, -- Cremating Torch
 			[131585] = true, -- Gin-Ji Knife Set
 			[140271] = true, -- Ra'sha's Sacrificial Dagger
+			[71909] = true,
 		-- Banquets
 			[104958] = true, -- Pandaren Banquet
 			[105193] = true, -- Great Pandaren Banquet

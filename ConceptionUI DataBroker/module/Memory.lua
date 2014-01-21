@@ -3,28 +3,19 @@ local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage = UpdateAddOnMemoryUsage, GetA
 local AWP, N = _G['!AWP'], GetNumAddOns()
 
 local function Colored(n)
-	if n > 999 then
-		n = n/1024
-		if n > 24 then
-			return '9E0000', n, 'M'
-		elseif n > 10 then
-			return '610000', n, 'M'
-		elseif n > 5 then
-			return '9E9E00', n, 'M'
-		else
-			return '616100', n, 'M'
-		end
+	if n > 1024 then
+		return '9E00', n/1024, 'M'
+	elseif n > 500 then
+		return '9E9E', n, 'K'
+	elseif n > 50 then
+		return '009E', n, 'K'
 	else
-		if n > 100 then
-			return '009E00', n, 'K'
-		else
-			return '006100', n, 'K'
-		end
+		return '0061', n, 'K'
 	end
 end
 
 local function FormatMemory(mem)
-	return ('|cFF%s%.2f|cFF616161%sB|r'):format(Colored(mem))
+	return ('|cFF%s00%.2f|cFF616161%sB|r'):format(Colored(mem))
 end
 
 local function UpdateMemoryUsage()
@@ -62,14 +53,14 @@ function Memory.OnTooltipShow(tip)
 	end
 	wipe(mem)
 	tip:AddLine(' ')
-	tip:AddDoubleLine('User', Memory.text, .38, .38, .38)
-	tip:AddDoubleLine('Blizzard', FormatMemory(gc-total), .38, .38, .38)
-	tip:AddDoubleLine('Total', FormatMemory(gc), .62, .62, .62)
-
-	tip:AddDoubleLine('\nRefresh', '\n[L]', .38, .38, .38, .62, .38, 0)
-	tip:AddDoubleLine('Garbage Collect', '[R]', .38, .38, .38, 0, .38, .62)
+	tip:AddDoubleLine('玩家插件', Memory.text, .38, .38, .38)
+	tip:AddDoubleLine('暴雪插件', FormatMemory(gc-total), .38, .38, .38)
+	tip:AddDoubleLine('總計', FormatMemory(gc), .62, .62, .62)
+	tip:AddLine(' ')
+	tip:AddDoubleLine('刷新', '[L]', .38, .38, .38, .62, .38, 0)
+	tip:AddDoubleLine('回收記憶體', '[R]', .38, .38, .38, 0, .38, .62)
 	if AWP then
-		tip:AddDoubleLine('AddOn Work Permission', '[M]', .38, .38, .38, .19, .62, .19)
+		tip:AddDoubleLine('插件管理', '[M]', .38, .38, .38, .19, .62, .19)
 	end
 end
 

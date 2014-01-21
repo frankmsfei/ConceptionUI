@@ -3,11 +3,11 @@ local GetFramerate, format = GetFramerate, format
 
 local function Colored(n)
 	if n <= 30 then
-		return '|cFF610000', n -- red
+		return '|cFF9E0000', n -- red
 	elseif n <= 50 then
-		return '|cFF616100', n -- yellow
+		return '|cFF9E9E00', n -- yellow
 	else
-		return '|cFF006100', n -- green
+		return '|cFF009E00', n -- green
 	end
 end
 
@@ -34,8 +34,9 @@ end
 
 function Graphics.OnTooltipShow(tip)
 	tip:AddDoubleLine('Graphics', Graphics.text, 1, 1, 1, 1, 1, 1)
+	tip:AddLine(' ')
 
-	tip:AddDoubleLine('\nGraphics Engine', ('\n%sbits, %s'):format(GetCVar('launchThirtyTwoBitClient') and '32' or '64', GetCVar('gxApi')), .62, .62, 0, .62, .62, .62)
+	tip:AddDoubleLine('Graphics Engine', ('%sbits, %s'):format(GetCVar('launchThirtyTwoBitClient') and '32' or '64', GetCVar('gxApi')), .62, .62, 0, .62, .62, .62)
 	tip:AddDoubleLine('gxResolution', GetCVar('gxResolution'), .62, .62, .62, .62, .62, .62)
 	tip:AddDoubleLine('gxColorBits', ('%sbit'):format(GetCVar('gxColorBits')), .62, .62, .62, .62, .62, .62)
 	tip:AddDoubleLine('gxDepthBits', ('%sbit'):format(GetCVar('gxDepthBits')), .62, .62, .62, .62, .62, .62)
@@ -45,14 +46,16 @@ function Graphics.OnTooltipShow(tip)
 	tip:AddDoubleLine(CVar('gxTextureCacheSize')) -- Set the cache size
 	tip:AddDoubleLine(CVar('gxTripleBuffer'))
 	tip:AddDoubleLine(CVar('gxVSync'))
+	tip:AddLine(' ')
 
-	tip:AddLine('\nTextures', .62, .62, 0)
+	tip:AddLine('Textures', .62, .62, 0)
 	tip:AddDoubleLine(CVar('baseMip'))
 	tip:AddDoubleLine(CVar('bspcache'))
 	tip:AddDoubleLine(CVar('componentCompress')) -- Fixes issues with characters being fully black caused by bad/old drivers.
 	tip:AddDoubleLine(CVar('componentTextureLevel')) -- Number of mip levels used for character component textures
 	tip:AddDoubleLine(CVar('componentThread'))
 	tip:AddDoubleLine(CVar('textureFilteringMode'))
+	tip:AddLine(' ')
 
 	tip:AddLine('Effects', .62, .62, 0)
 	tip:AddDoubleLine(CVar('SSAO'))
@@ -75,6 +78,7 @@ function Graphics.OnTooltipShow(tip)
 	tip:AddDoubleLine(CVar('ffxRectangle'))
 	tip:AddDoubleLine(CVar('ffxNetherWorld'))
 	tip:AddDoubleLine(CVar('particleDensity'))
+	tip:AddLine(' ')
 
 	tip:AddLine('Shadow', .62, .62, 0)
 	tip:AddDoubleLine(CVar('shadowMode')) -- Controls the detail level of ingame shadows
@@ -82,6 +86,7 @@ function Graphics.OnTooltipShow(tip)
 	tip:AddDoubleLine(CVar('shadowinstancing')) -- Shadow optimization which prevents flickering
 	tip:AddDoubleLine(CVar('shadowcull')) -- enable shadow frustum culling
 	tip:AddDoubleLine(CVar('shadowscissor')) -- Enables scissoring when rendering shadowmaps
+	tip:AddLine(' ')
 
 	tip:AddLine('Environment', .62, .62, 0)
 	tip:AddDoubleLine(CVar('groundEffectDist'))
@@ -91,8 +96,9 @@ function Graphics.OnTooltipShow(tip)
 	tip:AddDoubleLine(CVar('showfootprintparticles'))
 	tip:AddDoubleLine(CVar('farclip'))
 	tip:AddDoubleLine(CVar('nearclip'))
+	tip:AddLine(' ')
 
-	tip:AddDoubleLine('\nUIParent Size', ('\n%dx%d'):format(GetScreenWidth(), GetScreenHeight()), .62, .62, 0, .62, .62, .62)
+	tip:AddDoubleLine('UIParent Size', ('%dx%d'):format(GetScreenWidth(), GetScreenHeight()), .62, .62, 0, .62, .62, .62)
 	if GetCVar('useuiscale') == '1' then
 		tip:AddDoubleLine('uiScale', ('%s'):format(GetCVar('uiScale')), .62, .62, .62, .62, .62, .62)
 	else
@@ -100,12 +106,15 @@ function Graphics.OnTooltipShow(tip)
 	end
 	tip:AddDoubleLine(CVar('maxFPS'))
 	tip:AddDoubleLine(CVar('maxFPSbk'))
+	tip:AddLine(' ')
 
-	tip:AddDoubleLine('\nscreenshotFormat', ('\n%s'):format(GetCVar('screenshotFormat')), .62, .62, 0, .62, .62, .62)
+	tip:AddDoubleLine('screenshotFormat', GetCVar('screenshotFormat'), .62, .62, 0, .62, .62, .62)
 	tip:AddDoubleLine(CVar('screenshotQuality'))
-	tip:AddDoubleLine('\nRefresh', '\n[L]', .38, .38, .38, .62, .38, 0)
-	tip:AddDoubleLine('Restart Graphics Engine', '[R]', .38, .38, .38, 0, .38, .62)
-	tip:AddDoubleLine('Window Mode Toggle', 'ALT+[L]', .38, .38, .38, .62, .38, 0)
+	tip:AddLine(' ')
+
+	tip:AddDoubleLine('刷新', '[L]', .38, .38, .38, .62, .38, 0)
+	tip:AddDoubleLine('重啓圖像引擎', '[R]', .38, .38, .38, 0, .38, .62)
+	tip:AddDoubleLine('切換視窗模式', 'ALT+[L]', .38, .38, .38, .62, .38, 0)
 end
 
 function Graphics.OnClick(self, button)

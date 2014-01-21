@@ -1,17 +1,17 @@
-local E, P = ExtraActionBarFrame, PlayerPowerBarAlt
+ExtraActionBarFrame:SetParent(ConceptionCORE)
+--ExtraActionBarFrame.SetParent = function()end
+--ExtraActionBarFrame:SetMovable(true)
+--ExtraActionBarFrame:SetUserPlaced(true)
+ExtraActionBarFrame:ClearAllPoints()
+ExtraActionBarFrame:SetPoint('BOTTOM', UIParent, 'BOTTOM', 0, 140)
+--ExtraActionBarFrame.SetPoint = function()end
+--ExtraActionBarFrame:SetScale(1)
 
-E:SetParent(ConceptionUI[1])
-E.SetParent = function()end
-E:SetMovable(true)
-E:ClearAllPoints()
-E:SetPoint('BOTTOM', UIParent, 'BOTTOM', 0, 150)
-E.SetPoint = function()end
-E:SetScale(.8)
-
-P:SetParent(ConceptionUI[1])
-P:SetMovable(true)
-P:SetUserPlaced(true)
-P:ClearAllPoints()
-P:SetPoint('BOTTOM', UIParent, 'BOTTOM', 0, 340)
-P.SetPoint = function()end
-P:SetScale(.8)
+PlayerPowerBarAlt:SetParent(ConceptionCORE)
+--PlayerPowerBarAlt:SetMovable(true)
+--PlayerPowerBarAlt:SetUserPlaced(true)
+PlayerPowerBarAlt:ClearAllPoints()
+PlayerPowerBarAlt:SetPoint('BOTTOM', UIParent, 'BOTTOM', 0, 340)
+--PlayerPowerBarAlt.SetPoint = function()end
+--PlayerPowerBarAlt:SetScale(1)
+PlayerPowerBarAlt.statusFrame.text:SetFont(DAMAGE_TEXT_FONT, 12, 'OUTLINE')

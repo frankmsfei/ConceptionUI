@@ -1,34 +1,39 @@
 WorldMapFrame.Position = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
 WorldMapFrame.Position:SetFont(STANDARD_TEXT_FONT, 12, 'THINOUTLINE')
-WorldMapFrame.Position:SetPoint('BOTTOMLEFT', WorldMapPositioningGuide, 'BOTTOMLEFT', 10, 10)
-
+WorldMapFrame.Position:SetPoint('BOTTOM', WorldMapPositioningGuide, 'BOTTOM', 0, 10)
 WorldMapFrame.Clock = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
 WorldMapFrame.Clock:SetFont(DAMAGE_TEXT_FONT, 24, 'OUTLINE')
 WorldMapFrame.Clock:SetPoint('BOTTOM', WorldMapPositioningGuide, 'TOP', 0, 12)
-
 WorldMapFrame.Date = WorldMapFrame:CreateFontString(nil, 'OVERLAY')
 WorldMapFrame.Date:SetFont(DAMAGE_TEXT_FONT, 12, 'OUTLINE')
 WorldMapFrame.Date:SetPoint('BOTTOM', WorldMapFrame.Clock, 'TOP', 0, 12)
 
 local function GetCoordinate()
 	local x, y = GetPlayerMapPosition('player')
-	return 100*x, 100*y
+	if x == 0 and y == 0 then
+		return
+	else
+		return ('%.2f , %.2f'):format(100*x, 100*y)
+	end
 end
 
-WorldMapFrame:HookScript('OnUpdate', function(self)
-	self.Position:SetFormattedText('%.2f , %.2f', GetCoordinate())
+local function OnUpdate(self)
+	self.Position:SetText(GetCoordinate())
 	self.Clock:SetFormattedText('%.2d:%.2d', GetGameTime())
 	self.Date:SetText(date('%A, %b %d'))
-end)
+end
+WorldMapFrame:HookScript('OnUpdate', OnUpdate)
 
-hooksecurefunc(WorldMapFrame, "Show", function(self)
-	self:SetScale(.64)
-	self:EnableKeyboard(false)
+
+
+local function SetMap(self)
+	self:SetScale(.83)
 	BlackoutWorld:Hide()
-	WorldMapFrame:EnableMouse(false)
-end)
+end
+hooksecurefunc(WorldMapFrame, "Show", SetMap)
 
-local UnitClass, UnitName, UnitGroupRolesAssigned, RAID_CLASS_COLORS = UnitClass, UnitName, UnitGroupRolesAssigned, RAID_CLASS_COLORS
+
+
 local ROLE = {
 	['DAMAGER'] = '|c%s%s|r|TInterface/LFGFRAME/LFGROLE:0:0:0:0:64:16:17:32:1:16|t',
 	['TANK']    = '|c%s%s|r|TInterface/LFGFRAME/LFGROLE:0:0:0:0:64:16:33:48:1:16|t',
@@ -37,12 +42,11 @@ local ROLE = {
 }
 
 local function SetName(self)
-		if not UnitExists(self.unit) then
-			return
-		end
+		self:SetSize(10, 10)
+		if not UnitExists(self.unit) then return end
 		if not self.unitname then
 			 self.unitname = self:CreateFontString(nil, 'OVERLAY')
-			 self.unitname:SetFont(STANDARD_TEXT_FONT, 8, 'THINOUTLINE')
+			 self.unitname:SetFont(STANDARD_TEXT_FONT, 10, 'THINOUTLINE')
 			 self.unitname:SetPoint('LEFT', self.icon, 'RIGHT')
 		end
 		local colorStr = '00000000'

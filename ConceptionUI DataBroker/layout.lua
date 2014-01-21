@@ -7,7 +7,7 @@ local mem = cargoShip('Memory')
 local spc = cargoShip('Spec')
 local dur = cargoShip('Durability')
 local equ = cargoShip('Equip')
-local log = cargoShip('CombatLogger')
+local log = cargoShip('CombatLog')
 
 local	x = 16
 
@@ -31,16 +31,3 @@ equ:SetPoint('RIGHT', spc, 'LEFT', -x, 0)
 equ.Text:SetJustifyH('RIGHT')
 dur:SetPoint('LEFT', spc, 'RIGHT', x, 0)
 dur.Text:SetJustifyH('LEFT')
-
--- ICON BUTTONS
---txt:SetPoint('RIGHT', TimeManagerClockButton, 'LEFT', x, 0)
---bag:SetPoint('RIGHT', TimeManagerClockButton, 'LEFT', -3*x, 0)
-
---[[
-local obj = {qck, net, fps, mem, pbs, spc, dur, equ}
-for k, v in pairs(obj) do
-	if v.Text then v.Text:SetFont('Interface\\AddOns\\ConceptionUI\\media\\fonts\\pixel.ttf', 10) end
-	if v.Icon then v.Icon:SetTexCoord(.1, .9, .1, .9) end
-end
-wipe(obj)
-]]

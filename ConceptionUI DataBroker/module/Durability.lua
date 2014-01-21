@@ -2,38 +2,35 @@
 	DurabilityFrame:UnregisterAllEvents()
 	DurabilityFrame:Hide()
 
+local function GradientColor(percent)
+	return percent <= 50 and 157.59 or 1.5759 * (100 - percent), percent >= 50 and 157.59 or 1.5759 * percent, 0, percent
+end
+
 local function UpdateDurability()
 	local total_cur, total_max, dangerous = 0, 0, nil
 	for i = 1, 19 do
-		if GetInventoryAlertStatus(i) > 0 then
-			dangerous = true
-		end
 		local cur, max = GetInventoryItemDurability(i)
 		if cur then
 			total_cur = total_cur + cur
 			total_max = total_max + max
 		end
+		if GetInventoryAlertStatus(i) > 0 then
+			dangerous = true
+		end
 	end
 	local dur = 100*total_cur/total_max
-	if dur ~= dur then
-		Durability.text = '|cFF616161NONE|r'
-		return
+	if not dangerous then
+		dur = ('|cFF%02X%02X%02X%.1f|cFF616161%%|r'):format(GradientColor(dur))
 	else
-		if dur > 50 then
-			dur = ('|cFF009E00%.1f|cFF616161%%|r'):format(dur)
-		elseif dur > 20 then
-			dur = ('|cFF9E9E00%.1f|cFF616161%%|r'):format(dur)
-		else
-			dur = ('|cFF9E0000%.1f|cFF616161%%|r'):format(dur)
-		end
+		dur = ('|cFF9E0000%.1f|cFF616161%%|r'):format(dur)
 	end
 	Durability.text = dur
 end
 
 local HiddenTip = CreateFrame('GameTooltip')
-	HiddenTip:RegisterEvent('PLAYER_DEAD')
+	HiddenTip['UPDATE_INVENTORY_DURABILITY'] = UpdateDurability
 	HiddenTip:RegisterEvent('UPDATE_INVENTORY_DURABILITY')
-	HiddenTip.UPDATE_INVENTORY_DURABILITY = UpdateDurability
+	HiddenTip:RegisterEvent('PLAYER_DEAD')
 	HiddenTip:SetScript('OnEvent', function(self, event) self[event](self, event) end)
 	HiddenTip:Hide()
 
@@ -68,7 +65,7 @@ end
 			
 		end
 		Tip:AddLine(' ')
-		Tip:AddDoubleLine('Equipped', tomoney(total_cost), .62, .62, .62)
+		Tip:AddDoubleLine('當前裝備', tomoney(total_cost), .62, .62, .62)
 		for bag = 0, 4 do
 			for slot = 1, GetContainerNumSlots(bag) do
 				local _, repair_cost = HiddenTip:SetBagItem(bag, slot)
@@ -77,7 +74,7 @@ end
 				end
 			end
 		end
-		Tip:AddDoubleLine('Total', tomoney(total_cost), .62, .62, .62)
+		Tip:AddDoubleLine('總計', tomoney(total_cost), .62, .62, .62)
 	end
 
 DurabilityFrame:UnregisterAllEvents()

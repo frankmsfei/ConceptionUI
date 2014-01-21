@@ -194,12 +194,11 @@ local function SetTitle(self, i)
 	return SetCurrentTitle(i)
 end
 
-local info = {}
-
 hooksecurefunc('UnitPopup_ShowMenu', function(dropdownMenu, which, unit, name, userData)
 	if which ~= 'SELF' then return end
 	local which = UIDROPDOWNMENU_INIT_MENU.which
 	if which == 'HIDE_NAMEPLATE' then
+		local info = {}
 		local enable = ConceptionCFG['HideFriendlyNameplatesInCombat'] and ConceptionCFG['HideFriendlyNameplatesInCombat'] or false
 		info.text = ENABLE
 		info.func = function()
@@ -224,6 +223,7 @@ hooksecurefunc('UnitPopup_ShowMenu', function(dropdownMenu, which, unit, name, u
 		UIDropDownMenu_AddButton(info, 2)
 		wipe(info)
 	elseif which == 'SELECT_TITLE' then
+		local info = {}
 		local titles = ConceptionCFG['FavoriteTitles']
 		if titles then
 			for id in pairs(titles) do
