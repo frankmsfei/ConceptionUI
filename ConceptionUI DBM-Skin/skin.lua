@@ -49,77 +49,70 @@ local function SkinBar(self)
 end
 
 local function ApplyStyle(self)
-	if not self.skin then
-		SkinBar(self)
+		if self.color then
+			self.bar:SetStatusBarColor(self.color.r, self.color.g, self.color.b)
+		else
+			self.bar:SetStatusBarColor(self.owner.options.StartColorR, self.owner.options.StartColorG, self.owner.options.StartColorB)
+		end
+		self.bar_text:SetTextColor(self.owner.options.TextColorR, self.owner.options.TextColorG, self.owner.options.TextColorB)
+		self.bar_timer:SetTextColor(self.owner.options.TextColorR, self.owner.options.TextColorG, self.owner.options.TextColorB)
+		if self.owner.options.IconLeft then self.bar_icon1:Show() self.bar_icon1.overlay:Show() self.bar_icon1.shadow:Show() else self.bar_icon1:Hide() self.bar_icon1.overlay:Hide() self.bar_icon1.shadow:Hide() end
+		if self.owner.options.IconRight then self.bar_icon2:Show() self.bar_icon2.overlay:Show() self.bar_icon2.shadow:Show() else self.bar_icon2:Hide() self.bar_icon2.overlay:Hide() self.bar_icon2.shadow:Hide() end
+		if self.enlarged then
+			self.bar_texture:SetTexture(self.owner.options.Texture)
+			self.bar_backdrop:Show()
+			self.frame:SetWidth(self.owner.options.HugeWidth)
+			self.bar:SetWidth(self.owner.options.HugeWidth)
+			self.frame:SetScale(self.owner.options.HugeScale)
+			self.bar_text:ClearAllPoints()
+			self.bar_text:SetPoint('CENTER', self.frame, 'CENTER', 0, 0)
+			self.bar_timer:ClearAllPoints()
+			self.bar_timer:SetPoint('LEFT', self.bar_text, 'RIGHT', 4, 0)
+			self.bar_icon1:ClearAllPoints()
+			self.bar_icon1:SetPoint('RIGHT', self.bar_text, 'LEFT', -4, 0)
+			self.bar_icon2:ClearAllPoints()
+			self.bar_icon2:SetPoint('LEFT', self.bar_timer, 'RIGHT', 4, 0)
+		else
+			self.bar_texture:SetTexture(nil)
+			self.bar_backdrop:Hide()
+			self.frame:SetWidth(self.owner.options.Width)
+			self.bar:SetWidth(self.owner.options.Width)
+			self.frame:SetScale(self.owner.options.Scale)
+			self.bar_icon1:ClearAllPoints()
+			self.bar_icon1:SetPoint('BOTTOMRIGHT', self.frame, 'BOTTOMLEFT', -4, 0)
+			self.bar_icon2:ClearAllPoints()
+			self.bar_icon2:SetPoint('BOTTOMLEFT', self.frame, 'BOTTOMRIGHT', 4, 0)
+			self.bar_text:ClearAllPoints()
+			self.bar_text:SetPoint('LEFT', self.bar_icon1, 'RIGHT', 4, 0)
+			self.bar_timer:ClearAllPoints()
+			self.bar_timer:SetPoint('RIGHT', self.bar_icon2, 'LEFT', -4, 0)
+		end
+		self.frame:Show()
+		self.frame:SetAlpha(1)
+		self.bar_text:SetFont(self.owner.options.Font, self.owner.options.FontSize, 'THICKOUTLINE')
+		self.bar_timer:SetFont(self.owner.options.Font, self.owner.options.FontSize, 'THICKOUTLINE')
+		self:Update(0)
 	end
-	if self.color then
-		self.bar:SetStatusBarColor(self.color.r, self.color.g, self.color.b)
-	else
-		self.bar:SetStatusBarColor(self.owner.options.StartColorR, self.owner.options.StartColorG, self.owner.options.StartColorB)
-	end
-	self.bar_text:SetTextColor(self.owner.options.TextColorR, self.owner.options.TextColorG, self.owner.options.TextColorB)
-	self.bar_timer:SetTextColor(self.owner.options.TextColorR, self.owner.options.TextColorG, self.owner.options.TextColorB)
-	if self.owner.options.IconLeft then self.bar_icon1:Show() self.bar_icon1.overlay:Show() self.bar_icon1.shadow:Show() else self.bar_icon1:Hide() self.bar_icon1.overlay:Hide() self.bar_icon1.shadow:Hide() end
-	if self.owner.options.IconRight then self.bar_icon2:Show() self.bar_icon2.overlay:Show() self.bar_icon2.shadow:Show() else self.bar_icon2:Hide() self.bar_icon2.overlay:Hide() self.bar_icon2.shadow:Hide() end
-	if self.enlarged then
-		self.bar_texture:SetTexture(self.owner.options.Texture)
-		self.bar_backdrop:SetAlpha(1)
-		self.frame:SetWidth(self.owner.options.HugeWidth)
-		self.bar:SetWidth(self.owner.options.HugeWidth)
-		self.frame:SetScale(self.owner.options.HugeScale)
-		self.bar_text:ClearAllPoints()
-		self.bar_text:SetPoint('CENTER', self.frame, 'CENTER', 0, 0)
-		self.bar_timer:ClearAllPoints()
-		self.bar_timer:SetPoint('LEFT', self.bar_text, 'RIGHT', 4, 0)
-		self.bar_icon1:ClearAllPoints()
-		self.bar_icon1:SetPoint('RIGHT', self.bar_text, 'LEFT', -4, 0)
-		self.bar_icon2:ClearAllPoints()
-		self.bar_icon2:SetPoint('LEFT', self.bar_timer, 'RIGHT', 4, 0)
-	else
-		self.bar_texture:SetTexture(nil)
-		self.bar_backdrop:SetAlpha(0)
-		self.frame:SetWidth(self.owner.options.Width)
-		self.bar:SetWidth(self.owner.options.Width)
-		self.frame:SetScale(self.owner.options.Scale)
-		self.bar_icon1:ClearAllPoints()
-		self.bar_icon1:SetPoint('BOTTOMRIGHT', self.frame, 'BOTTOMLEFT', -4, 0)
-		self.bar_icon2:ClearAllPoints()
-		self.bar_icon2:SetPoint('BOTTOMLEFT', self.frame, 'BOTTOMRIGHT', 4, 0)
-		self.bar_text:ClearAllPoints()
-		self.bar_text:SetPoint('LEFT', self.bar_icon1, 'RIGHT', 4, 0)
-		self.bar_timer:ClearAllPoints()
-		self.bar_timer:SetPoint('RIGHT', self.bar_icon2, 'LEFT', -4, 0)
-	end
-	self.frame:Show()
-	self.frame:SetAlpha(1)
-	self.bar_text:SetFont(self.owner.options.Font, self.owner.options.FontSize, 'THICKOUTLINE')
-	self.bar_timer:SetFont(self.owner.options.Font, self.owner.options.FontSize, 'THICKOUTLINE')
-	self:Update(0)
-end
 
 local function Apply(self)
 	local name = self.frame:GetName()
 	self.bar = _G[name.."Bar"]
+	self.bar_texture = _G[name.."BarTexture"]
 	self.bar_background = _G[name.."BarBackground"]
 	self.bar_spark = _G[name.."BarSpark"]
-	self.bar_texture = _G[name.."BarTexture"]
 	self.bar_icon1 = _G[name.."BarIcon1"]
 	self.bar_icon2 = _G[name.."BarIcon2"]
 	self.bar_timer = _G[name.."BarTimer"]
 	self.bar_text = _G[name.."BarName"]
-	ApplyStyle(self)
-	self.apply = true
+	self.ApplyStyle = ApplyStyle
+	SkinBar(self)
+	self:ApplyStyle()
 end
 
 local function ApplyBars(self, timer, id, icon, huge, small, color, isDummy)
-	self.mainAnchor:ClearAllPoints()
-	self.mainAnchor:SetPoint('LEFT', UIParent, 'LEFT', 130, 50)
-	self.secAnchor:ClearAllPoints()
-	self.secAnchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 320)
-	for bar in pairs(self.bars) do
-		if not bar.apply then
+	for bar in self:GetBarIterator() do
+		if not bar.skin then
 			Apply(bar)
-			bar.ApplyStyle = ApplyStyle
 		 end
 	end
 end
@@ -144,6 +137,12 @@ local function OnEvent()
 	DBT_SavedOptions['DBM'].IconLeft = true
 	DBT_SavedOptions['DBM'].IconRight = false
 	DBT_SavedOptions['DBM'].FillUpBars = false
+	DBT_SavedOptions['DBM'].TimerPoint = 'LEFT'
+	DBT_SavedOptions['DBM'].TimerX = 132
+	DBT_SavedOptions['DBM'].TimerY = 50
+	DBT_SavedOptions['DBM'].HugeTimerPoint = 'CENTER'
+	DBT_SavedOptions['DBM'].HugeTimerX = 0
+	DBT_SavedOptions['DBM'].HugeTimerY = 320
 	DBM_SavedOptions.SpecialWarningPoint = 'CENTER'
 	DBM_SavedOptions.SpecialWarningX = 0
 	DBM_SavedOptions.SpecialWarningY = 250

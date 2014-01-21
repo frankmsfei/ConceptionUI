@@ -18,6 +18,7 @@ local healthbar_height = 2*px
 local castbar_height = 1*px
 local bar_gap = 1*px
 
+local buttonShadow = D.MEDIA.TEXTURE.buttonShadow
 local spellicon_size = 10*px
 local spellicon_offset = -2*px
 local raidicon_size = 32*px
@@ -110,12 +111,17 @@ function NAMEPLATE:Skin(plate)
 		spellIcon:ClearAllPoints()
 		spellIcon:SetPoint('TOPRIGHT', spellName, 'TOPLEFT', -1, -.5)
 		old_castbar.spellIcon = spellIcon
-		spellName:SetFont(name_font, numb_size)
-		spellName:SetShadowOffset(0, -1)
+		spellName:SetFont(name_font, numb_size, 'OUTLINE')
 		spellName:ClearAllPoints()
 		spellName:SetPoint('TOP', castbar, 'BOTTOM', .5*spellicon_size, -1)
 		old_castbar.spellName = spellName
 		castbarShadow:SetTexture(nil)
+
+		castbar.icon_shadow = old_castbar:CreateTexture(nil, 'BACKGROUND')
+		castbar.icon_shadow:SetTexture(buttonShadow)
+		castbar.icon_shadow:SetPoint('TOPLEFT', spellIcon, 'TOPLEFT', -2, 2)
+		castbar.icon_shadow:SetPoint('BOTTOMRIGHT', spellIcon, 'BOTTOMRIGHT', 2, -2)
+		castbar.icon_shadow:SetVertexColor(1, 1, 1, 1)
 
 	local old_name = nameFrame:GetRegions()
 
