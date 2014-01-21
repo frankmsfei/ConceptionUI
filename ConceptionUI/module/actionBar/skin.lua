@@ -47,7 +47,7 @@ local function Skin(self)
 
 	local hotkey = _G[name..'HotKey']
 	if hotkey then
-		hotkey:SetFont(STANDARD_TEXT_FONT, 8, 'THINOUTLINE')
+		hotkey:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
 		hotkey:ClearAllPoints()
 		hotkey:SetPoint('TOPRIGHT')
 		hotkey:SetDrawLayer('HIGHLIGHT')
@@ -55,7 +55,7 @@ local function Skin(self)
 		
 	local macro_name = _G[name..'Name']
 	if macro_name then
-		macro_name:SetFont(STANDARD_TEXT_FONT, 8, 'THINOUTLINE')
+		macro_name:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
 		macro_name:ClearAllPoints()
 		macro_name:SetPoint('BOTTOM')
 		macro_name:SetDrawLayer('HIGHLIGHT')
@@ -63,7 +63,7 @@ local function Skin(self)
 
 	local count = _G[name..'Count']
 	if count then
-		count:SetFont(STANDARD_TEXT_FONT, 12, 'THINOUTLINE')
+		count:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')
 		count:ClearAllPoints()
 		count:SetPoint('BOTTOMRIGHT')
 		count:SetDrawLayer('OVERLAY')

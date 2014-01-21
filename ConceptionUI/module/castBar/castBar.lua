@@ -7,7 +7,7 @@ C.auraRows = 0
 local function Skin(self)
 	self.spellName = self:CreateFontString()
 	self.spellName:SetPoint('CENTER')
-	self.spellName:SetFont(DAMAGE_TEXT_FONT, 12, 'THINOUTLINE')
+	self.spellName:SetFont(DAMAGE_TEXT_FONT, 12, 'OUTLINE')
 	self.barBacadrop = CreateFrame('Frame', nil, self)
 	self.barBacadrop:SetPoint('TOPLEFT', -3, 3)
 	self.barBacadrop:SetPoint('BOTTOMRIGHT', 3, -3)

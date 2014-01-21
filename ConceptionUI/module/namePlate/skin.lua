@@ -54,18 +54,18 @@ function NAMEPLATE:Skin(plate)
 		castbar:Hide()
 
 	local id = plate:CreateFontString()
-		id:SetFont(name_font, name_size, 'THINOUTLINE')
+		id:SetFont(name_font, name_size, 'OUTLINE')
 		id:SetPoint('BOTTOM', healthbar, 'TOP', 0, name_offset)
 		plate.id = id
 
 	local hp = plate:CreateFontString()
 		hp:SetPoint('LEFT', id, 'RIGHT', hp_offset, 0)
-		hp:SetFont(numb_font, numb_size, 'THINOUTLINE')
+		hp:SetFont(numb_font, numb_size, 'OUTLINE')
 		plate.hp = hp
 
 	local lv = plate:CreateFontString()
 		lv:SetPoint('RIGHT', id, 'LEFT', lv_offset, 0)
-		lv:SetFont(numb_font, numb_size, 'THINOUTLINE')
+		lv:SetFont(numb_font, numb_size, 'OUTLINE')
 		plate.lv = lv
 
 	local barFrame, nameFrame = plate:GetChildren()

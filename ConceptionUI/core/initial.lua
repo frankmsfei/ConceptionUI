@@ -6,18 +6,6 @@ function D.LOAD.P:Initial()
 	-- Spell Activation Overlay
 	SpellActivationOverlayFrame:SetScale(api.scale(1))
 
-	-- RaidBossEmoteFrame
-	--RaidBossEmoteFrame:ClearAllPoints()
-	--RaidBossEmoteFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, 150*C.SCALE_FIX)
-	--RaidWarningFrame:ClearAllPoints()
-	--RaidWarningFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, api.scale(150))
-	--RaidWarningFrame.SetParent = api.dummy
-
-	local RaidNoticeAddMessage = RaidNotice_AddMessage
-	function RaidNotice_AddMessage(noticeFrame, textString, colorInfo, displayTime)
-		return RaidNoticeAddMessage(noticeFrame, textString and textString:gsub(':12:12', ':0:0:0:0:64:64:5:59:5:59'), colorInfo, displayTime)
-	end
-
 	-- 解除玩家框架
 	UnregisterUnitWatch(PlayerFrame)
 	PlayerFrame:UnregisterAllEvents()
