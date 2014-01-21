@@ -1,4 +1,4 @@
-## Title: |TInterface/CURSOR/Attack:0|t |cFFCCCCCCConception|cFFAAAAAAUI|r
+## Title: |TInterface/CURSOR/Attack:0|t |cFFCCCCCCC|cFFAAAAAAUI|r
 ## Notes: |cFFCCCCCCConception|cFFAAAAAAUI|cFF00619E Core|r
 ## Author: 斬擊
 ## Version: JAN '14

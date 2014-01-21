@@ -1,48 +1,32 @@
 local C, D = unpack(ConceptionUI)
-local API = D.API
 local MEDIA = D.MEDIA
 local BAR_TEXTURE = MEDIA.TEXTURE.blank
-local BAR_BACKDROP = MEDIA.backdrop
+local BAR_BACKDROP = MEDIA.TEXTURE.backdrop
 local BUTTON_OVERLAY = MEDIA.TEXTURE.buttonOverlay
 local BUTTON_SHADOW = MEDIA.TEXTURE.buttonShadow
 
-
-DBT_SavedOptions['DBM'].Texture = BAR_TEXTURE
-DBT_SavedOptions['DBM'].Font = DAMAGE_TEXT_FONT
-DBT_SavedOptions['DBM'].FontSize = 16
-DBT_SavedOptions['DBM'].Scale = 1
-DBT_SavedOptions['DBM'].HugeScale = 1.618
-DBT_SavedOptions['DBM'].Width = 200
-DBT_SavedOptions['DBM'].HugeWidth = 200
-DBT_SavedOptions['DBM'].StartColorR = 1
-DBT_SavedOptions['DBM'].StartColorG = 1
-DBT_SavedOptions['DBM'].StartColorB = 1
-DBT_SavedOptions['DBM'].EndColorR = .618 
-DBT_SavedOptions['DBM'].EndColorG = 0
-DBT_SavedOptions['DBM'].EndColorB = 0
-DBT_SavedOptions['DBM'].IconLeft = true
-DBT_SavedOptions['DBM'].IconRight = false
-DBT_SavedOptions['DBM'].FillUpBars = false
-DBM_SavedOptions.SpecialWarningPoint = 'CENTER'
-DBM_SavedOptions.SpecialWarningX = 0
-DBM_SavedOptions.SpecialWarningY = 250
-DBM_SavedOptions.LTSpecialWarningPoint = 'CENTER'
-DBM_SavedOptions.LTSpecialWarningX = 0
-DBM_SavedOptions.LTSpecialWarningY = 140
 
 
 local function SkinBar(self)
 	self.bar:SetHeight(2)
 	self.bar:ClearAllPoints()
 	self.bar:SetPoint('BOTTOM', self.frame, 'BOTTOM', 0, 0)
-	self.bar_backdrop = API.DropShadow(self.bar)
+	self.bar_texture:SetDrawLayer('BACKGROUND')
+	self.bar_background:SetTexture(nil)
+	self.bar_backdrop = CreateFrame('Frame', nil, self.bar)
+	self.bar_backdrop:SetPoint('TOPRIGHT', self.bar, 'TOPRIGHT', 3, 3)
+	self.bar_backdrop:SetPoint('BOTTOMLEFT', self.bar, 'BOTTOMLEFT', -3, -3)
+	self.bar_backdrop:SetFrameLevel(self.bar:GetFrameLevel() -1 > 0 and self.bar:GetFrameLevel() -1 or 0)
+	self.bar_backdrop:SetBackdrop(BAR_BACKDROP)
+	self.bar_backdrop:SetBackdropColor(0, 0, 0, 1)
+	self.bar_backdrop:SetBackdropBorderColor(0, 0, 0, 1)
 	self.bar_icon1:SetSize(20, 20)
 	self.bar_icon1:SetDrawLayer('ARTWORK')
 	self.bar_icon1.overlay = self.bar:CreateTexture(nil, 'OVERLAY')
 	self.bar_icon1.overlay:SetAllPoints(self.bar_icon1)
 	self.bar_icon1.overlay:SetTexture(BUTTON_OVERLAY)
 	self.bar_icon1.overlay:SetVertexColor(0, 0, 0, 1)
-	self.bar_icon1.shadow = self.bar:CreateTexture(nil, 'BACKGROUND')
+	self.bar_icon1.shadow = self.bar:CreateTexture(nil, 'BORDER')
 	self.bar_icon1.shadow:SetPoint('TOPLEFT', self.bar_icon1, 'TOPLEFT', -4, 4)
 	self.bar_icon1.shadow:SetPoint('BOTTOMRIGHT', self.bar_icon1, 'BOTTOMRIGHT', 4, -4)
 	self.bar_icon1.shadow:SetTexture(BUTTON_SHADOW)
@@ -52,7 +36,7 @@ local function SkinBar(self)
 	self.bar_icon2.overlay:SetAllPoints(self.bar_icon2)
 	self.bar_icon2.overlay:SetTexture(BUTTON_OVERLAY)
 	self.bar_icon2.overlay:SetVertexColor(0, 0, 0, 1)
-	self.bar_icon2.shadow = self.bar:CreateTexture(nil, 'BACKGROUND')
+	self.bar_icon2.shadow = self.bar:CreateTexture(nil, 'BORDER')
 	self.bar_icon2.shadow:SetPoint('TOPLEFT', self.bar_icon2, 'TOPLEFT', -4, 4)
 	self.bar_icon2.shadow:SetPoint('BOTTOMRIGHT', self.bar_icon2, 'BOTTOMRIGHT', 4, -4)
 	self.bar_icon2.shadow:SetTexture(BUTTON_SHADOW)
@@ -79,7 +63,6 @@ local function ApplyStyle(self)
 	if self.owner.options.IconRight then self.bar_icon2:Show() self.bar_icon2.overlay:Show() self.bar_icon2.shadow:Show() else self.bar_icon2:Hide() self.bar_icon2.overlay:Hide() self.bar_icon2.shadow:Hide() end
 	if self.enlarged then
 		self.bar_texture:SetTexture(self.owner.options.Texture)
-		self.bar_background:SetAlpha(1)
 		self.bar_backdrop:SetAlpha(1)
 		self.frame:SetWidth(self.owner.options.HugeWidth)
 		self.bar:SetWidth(self.owner.options.HugeWidth)
@@ -94,7 +77,6 @@ local function ApplyStyle(self)
 		self.bar_icon2:SetPoint('LEFT', self.bar_timer, 'RIGHT', 4, 0)
 	else
 		self.bar_texture:SetTexture(nil)
-		self.bar_background:SetAlpha(0)
 		self.bar_backdrop:SetAlpha(0)
 		self.frame:SetWidth(self.owner.options.Width)
 		self.bar:SetWidth(self.owner.options.Width)
@@ -141,17 +123,47 @@ local function ApplyBars(self, timer, id, icon, huge, small, color, isDummy)
 		 end
 	end
 end
-
 hooksecurefunc(DBT, 'CreateBar', ApplyBars)
 
 
 
-local RaidNoticeAddMessage = RaidNotice_AddMessage
-function RaidNotice_AddMessage(noticeFrame, textString, colorInfo, displayTime)
-  return RaidNoticeAddMessage(noticeFrame, textString and textString:gsub(':12:12', ':0:0:0:0:64:64:5:59:5:59'), colorInfo, displayTime)
+local function OnEvent()
+	DBT_SavedOptions['DBM'].Texture = BAR_TEXTURE
+	DBT_SavedOptions['DBM'].Font = DAMAGE_TEXT_FONT
+	DBT_SavedOptions['DBM'].FontSize = 15
+	DBT_SavedOptions['DBM'].Scale = 1
+	DBT_SavedOptions['DBM'].HugeScale = 1.5
+	DBT_SavedOptions['DBM'].Width = 200
+	DBT_SavedOptions['DBM'].HugeWidth = 200
+	DBT_SavedOptions['DBM'].StartColorR = 1
+	DBT_SavedOptions['DBM'].StartColorG = 1
+	DBT_SavedOptions['DBM'].StartColorB = 1
+	DBT_SavedOptions['DBM'].EndColorR = .618
+	DBT_SavedOptions['DBM'].EndColorG = 0
+	DBT_SavedOptions['DBM'].EndColorB = 0
+	DBT_SavedOptions['DBM'].IconLeft = true
+	DBT_SavedOptions['DBM'].IconRight = false
+	DBT_SavedOptions['DBM'].FillUpBars = false
+	DBM_SavedOptions.SpecialWarningPoint = 'CENTER'
+	DBM_SavedOptions.SpecialWarningX = 0
+	DBM_SavedOptions.SpecialWarningY = 250
+	DBM_SavedOptions.LTSpecialWarningPoint = 'CENTER'
+	DBM_SavedOptions.LTSpecialWarningX = 0
+	DBM_SavedOptions.LTSpecialWarningY = 140
+
+	RaidWarningFrame.slot1:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
+	RaidWarningFrame.slot1:SetShadowOffset(0, 0)
+	RaidWarningFrame.slot2:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
+	RaidWarningFrame.slot2:SetShadowOffset(0, 0)
+
+	local RaidNoticeAddMessage = RaidNotice_AddMessage
+	function RaidNotice_AddMessage(noticeFrame, textString, colorInfo, displayTime)
+	  return RaidNoticeAddMessage(noticeFrame, textString and textString:gsub(':12:12', ':0:0:0:0:64:64:5:59:5:59'), colorInfo, displayTime)
+	end
+
+	print('|cFFCCCCCCC|cFFAAAAAAUI|r - DBM Skin Loaded.')
 end
 
-RaidWarningFrame.slot1:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
-RaidWarningFrame.slot1:SetShadowOffset(0, 0)
-RaidWarningFrame.slot2:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
-RaidWarningFrame.slot2:SetShadowOffset(0, 0)
+local F = CreateFrame('Frame')
+	F:SetScript('OnEvent', OnEvent)
+	F:RegisterEvent('PLAYER_LOGIN')

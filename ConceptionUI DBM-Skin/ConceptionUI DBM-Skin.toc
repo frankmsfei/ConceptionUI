@@ -1,4 +1,5 @@
 ## Title: |TInterface/CURSOR/Attack:12|t |cFFCCCCCCC|cFFAAAAAAUI|r - DBM Skin
+## Notes: |cFFCCCCCCConception|cFFAAAAAAUI|cFF00619E DBM Skin|r
 ## Author: 斬擊#3331
 ## Version: JAN '14
 ## Interface: 50400
