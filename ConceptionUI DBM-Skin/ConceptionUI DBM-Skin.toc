@@ -1,0 +1,6 @@
+## Title: |TInterface/CURSOR/Attack:12|t |cFFCCCCCCC|cFFAAAAAAUI|r - DBM Skin
+## Author: 斬擊#3331
+## Version: JAN '14
+## Interface: 50400
+## RequiredDeps: DBM-Core, ConceptionUI
+skin.lua
