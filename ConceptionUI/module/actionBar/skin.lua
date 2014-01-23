@@ -21,6 +21,7 @@ local function Skin(self)
 		normal:ClearAllPoints()
 		normal:SetAllPoints()
 	end
+	self.normal_texture = normal
 
 	local pushed = self:GetPushedTexture()
 	if pushed then
@@ -68,6 +69,7 @@ local function Skin(self)
 		count:SetPoint('BOTTOMRIGHT')
 		count:SetDrawLayer('OVERLAY')
 	end
+	self.count = count
 
 	local icon = _G[name..'Icon']
 	if icon then
@@ -128,14 +130,12 @@ hooksecurefunc('ActionButton_Update', Skin)
 hooksecurefunc('PetActionButton_OnEvent', Skin)
 
 local IsEquippedAction, IsConsumableAction = IsEquippedAction, IsConsumableAction
-local function FixTexture(self)
-	self:GetNormalTexture():SetVertexColor(0, 0, 0, 1)
-	if not self.borderFrame then
-		return
-	end
+local function UpdateActionButton(self)
+	if not self.normal_texture then return end
+	self.normal_texture:SetVertexColor(0, 0, 0, 1)
 	local action = self.action
 	if IsConsumableAction(action) then
-		local count = tonumber(_G[self:GetName()..'Count']:GetText())
+		local count = tonumber(self.count:GetText())
 		if count == 0 then
 			self.borderFrame:SetBackdropBorderColor(.6, .1, .1, 1)
 		else
@@ -149,10 +149,24 @@ local function FixTexture(self)
 		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
 	end
 end
-hooksecurefunc('ActionButton_Update', FixTexture)
-hooksecurefunc('ActionButton_ShowGrid', FixTexture)
-hooksecurefunc('ActionButton_UpdateUsable', FixTexture)
+hooksecurefunc('ActionButton_Update', UpdateActionButton)
+hooksecurefunc('ActionButton_ShowGrid', UpdateActionButton)
+hooksecurefunc('ActionButton_UpdateUsable', UpdateActionButton)
 
+local function UpdatePetActionButton(self)
+	for i = 1, 10 do
+		local button = _G['PetActionButton'..i]
+		button.normal_texture:SetTexture(TEXTURE.buttonOverlay)
+		button.normal_texture:SetVertexColor(0, 0, 0, 1)
+		local name, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i)
+		if isActive then
+			button.borderFrame:SetBackdropBorderColor(.6, .6, .1, 1)
+		else
+			button.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+		end
+	end
+end
+hooksecurefunc('PetActionBar_Update', UpdatePetActionButton)
 
 local function UpdateHotkeys(self, actionButtonType)
 	local hotkey = _G[self:GetName()..'HotKey']

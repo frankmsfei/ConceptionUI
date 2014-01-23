@@ -17,7 +17,7 @@ local function UnitTarget(unit)
 	end
 end
 
-local REALM =  GetRealmName()
+local REALM = GetRealmName()
 local ICON_LIST = ICON_LIST
 local function DetectUnit(self)
 	local _, unit = self:GetUnit()
