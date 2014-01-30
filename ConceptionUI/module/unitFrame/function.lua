@@ -208,7 +208,6 @@ function FUNC.OnEnter(frame)
 	frame:SetBackdropColor(0,0,0,.382)
 	frame.arrow:Show()
 	if UnitAffectingCombat('player') then return end
-	local unit = frame:GetAttribute('unit')
 	Tip:SetOwner(frame, 'ANCHOR_NONE')
 	if frame.hpBar:GetReverseFill()==1 then
 		Tip:SetPoint('TOPRIGHT', frame, 'BOTTOMRIGHT', 2, -4)
@@ -216,7 +215,7 @@ function FUNC.OnEnter(frame)
 		Tip:SetPoint('TOPLEFT', frame, 'BOTTOMLEFT', -2, -4)
 	end
 	Tip:ClearLines()
-	Tip:SetUnit(unit)
+	Tip:SetUnit(frame:GetAttribute('unit'))
 	Tip:Show()
 end
 

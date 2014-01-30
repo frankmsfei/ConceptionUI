@@ -23,6 +23,16 @@ local TIPS = {
 	--QueueStatusFrame,
 }
 
+GameTooltip.TextLeft1 = GameTooltipTextLeft1
+GameTooltip.TextRight1 = GameTooltipTextRight1
+GameTooltip.TextLeft2 = GameTooltipTextLeft2
+GameTooltip.TextRight2 = GameTooltipTextRight2
+GameTooltip.TextLeft3 = GameTooltipTextLeft3
+GameTooltip.TextRight3 = GameTooltipTextRight3
+GameTooltip.TextLeft4 = GameTooltipTextLeft4
+GameTooltip.TextRight4 = GameTooltipTextRight4
+local GameTooltipText = GameTooltipText
+
 local function Skin(self)
 	if not self.backdrop then
 		self:SetBackdrop(TEXTURE.backdrop)
@@ -60,11 +70,11 @@ end
 local function FixMoneyFrame(self)
 	if self.fixed then return end
 	local prefix, suffix = self:GetRegions()
-	if prefix then
+	if prefix and prefix.SetFontObject then
 		prefix:SetFontObject(GameTooltipText)
 		prefix:SetShadowOffset(0, 0)
 	end
-	if suffix then
+	if suffix and suffix.SetFontObject then
 		suffix:SetFontObject(GameTooltipText)
 		suffix:SetShadowOffset(0, 0)
 	end

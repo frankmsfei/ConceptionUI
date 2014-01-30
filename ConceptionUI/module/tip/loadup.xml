@@ -1,6 +1,7 @@
 <ui>
 <script file = 'core.lua'/>
 <script file = 'skin.lua'/>
-<script file = 'unit.lua'/>
 <script file = 'id.lua'/>
+<script file = 'unit.lua'/>
+<script file = 'inspect.lua'/>
 </ui>

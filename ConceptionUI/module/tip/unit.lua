@@ -1,71 +1,175 @@
-local COLOR = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
-local function ClassColor(unit)
-	local _, class = UnitClass(unit)
-	if class then
-		return COLOR[class].colorStr
-	else
-		return 'ffffffff'
-	end
-end
-
 local UnitGUID = UnitGUID
-local function UnitTarget(unit)
-	if UnitGUID(unit)==UnitGUID('player') then
-		return ' @|cFFFF0000'..UnitName('player')..'|r'
-	else
-		return ' @|c'..ClassColor(unit)..UnitName(unit)..'|r'
-	end
-end
-
-local REALM = GetRealmName()
+local UnitExists = UnitExists
+local UnitName = UnitName
+local UnitPVPName = UnitPVPName
+local UnitLevel = UnitLevel
+local UnitClassBase = UnitClassBase
+local UnitRace = UnitRace
+local UnitSex = UnitSex
+local UnitReaction = UnitReaction
+local UnitFactionGroup = UnitFactionGroup
+local UnitClassification = UnitClassification
+local UnitCreatureType, UnitCreatureFamily = UnitCreatureType, UnitCreatureFamily
+local UnitIsPlayer, UnitIsBattlePet = UnitIsPlayer, UnitIsBattlePet
+local UnitIsAFK, UnitIsDND, UnitIsConnected = UnitIsAFK, UnitIsDND, UnitIsConnected
+local GetGuildInfo = GetGuildInfo
+local GetRaidTargetIndex = GetRaidTargetIndex
+local IsAltKeyDown = IsAltKeyDown -- debug
+local NotifyInspect = NotifyInspect -- inspect
+local GameTooltipText, GameTooltipHeaderText = GameTooltipText, GameTooltipHeaderText
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local FACTION_BAR_COLORS = FACTION_BAR_COLORS
 local ICON_LIST = ICON_LIST
-local function DetectUnit(self)
-	local _, unit = self:GetUnit()
-	if unit then
-		local player = UnitIsPlayer(unit)
-		if player then
-			local name, realm = UnitName(unit)
-			local title = UnitPVPName(unit) or ''
-			if title then
-				title = title:gsub(name, '')
-			end
-			GameTooltipTextLeft1:SetFormattedText('|cFF9E9E9E%s|c%s%s|r', title, ClassColor(unit), name)
+local LEVEL = LEVEL
+local PVP = PVP
+local UNIT = ConceptionCORE.UNIT
+local PLAYER_NAME = UnitName('player')
+local REALM =  GetRealmName()
 
-			local g, d, r = GetGuildInfo(unit)
-			if d then
-				GameTooltipTextLeft2:SetTextColor(.9, .8, .6)
-				GameTooltipTextLeft2:SetFormattedText('<%s>|r|cFF9E9E9E %s |r(%s)', g, d, 1+r)
-			end
+local CACHE = setmetatable({},{
+	__call = function(self, value)
+		tinsert(self, value)
+	end,
+	__mode = 'kv'
+})
 
-			local status = (UnitIsAFK(unit) and '|cFF9E6100 [AFK]|r') or (UnitIsDND(unit) and '|cFF9E0000 [DND]|r') or (not UnitIsConnected(unit) and '|cFF616161 [DC]|r')
-			if status then
-				self:AppendText(status)
-			end
+local function HexColor(colorTable)
+	return ('|cFF%02x%02x%02x'):format(255*colorTable.r, 255*colorTable.g, 255*colorTable.b)
+end
 
-			local faction, Lfaction = UnitFactionGroup(unit)
-			if faction then
-				faction = 'Alliance' and '3333FF' or 'Horde' and 'FF3333'
-				for i = 3, self:NumLines() do
-					local line = _G['GameTooltipTextLeft'..i]
-					local text = line:GetText() or ''
-					if text:find('^'..Lfaction..'$') then
-						line:SetFormattedText('|cFF%s%s - %s|r', faction, realm or REALM, Lfaction)
-						break				
-					end
-				end
-			else
-				self:AddLine(realm or REALM)
-			end
-		end
-
-		if UnitExists(unit..'target') then
-			self:AppendText(UnitTarget(unit..'target'))
-		end
-
-		local raidicon = GetRaidTargetIndex(unit)
-		if raidicon then
-			GameTooltipTextLeft1:SetFormattedText('%s:0|t  %s', ICON_LIST[raidicon], GameTooltipTextLeft1:GetText())
-		end
+local function GetClass(unit)
+	if not unit then return end
+	local Lclass, class = UnitClassBase(unit)
+	if class then
+		return RAID_CLASS_COLORS[class].colorStr, Lclass
+	else
+		return 'FF9E9E9E', '??'
 	end
 end
-GameTooltip:HookScript('OnTooltipSetUnit', DetectUnit)
+
+local function UnitIcon(unit)
+	local index = GetRaidTargetIndex(unit)
+	if not index then
+		return ''
+	else
+		return ('%s:0|t'):format(ICON_LIST[index])
+	end
+end
+
+local function SetTitleText(tip, title)
+	if title then
+		tip.TextLeft1:SetFontObject(GameTooltipText)
+		tip.TextRight1:SetFontObject(GameTooltipText)
+		tip.TextLeft2:SetFontObject(GameTooltipHeaderText)
+		tip.TextRight2:SetFontObject(GameTooltipHeaderText)
+	else
+		tip.TextLeft1:SetFontObject(GameTooltipHeaderText)
+		tip.TextRight1:SetFontObject(GameTooltipHeaderText)
+		tip.TextLeft2:SetFontObject(GameTooltipText)
+		tip.TextRight2:SetFontObject(GameTooltipText)
+	end
+end
+
+local function UnitTarget(unit)
+	if UNIT(UnitGUID(unit))=='player' then
+		return ('|cFFFF0000%s|r'):format(PLAYER_NAME)
+	else
+		return ('|c%s%s|r'):format(GetClass(unit), UnitName(unit))
+	end
+end
+
+local function SetUnit(tip)
+	if IsAltKeyDown() then return end
+	local name, unit = tip:GetUnit()
+	if not unit then return end
+	local class_color, class = GetClass(unit)
+	local level = UnitLevel(unit)
+	local sex = UnitSex(unit)
+	local location = nil
+	if tip.TextLeft3:GetText() and not tip.TextLeft3:GetText():find(LEVEL) and not tip.TextLeft3:GetText():find(PVP) then
+		location = tip.TextLeft3:GetText()
+	end
+	if tip.TextLeft4:GetText() and not tip.TextLeft4:GetText():find(LEVEL) and not tip.TextLeft4:GetText():find(PVP) then
+		location = tip.TextLeft4:GetText()
+	end
+	if UnitIsPlayer(unit) then
+		tip:ClearLines()
+		local _, realm = UnitName(unit)
+		if not realm or realm == '' then realm = REALM end
+		local title = (UnitPVPName(unit) or ''):gsub(name, '')
+		if title ~= '' then
+			tip:AddLine(('|cFF9E9E9E%s|r'):format(title))
+			SetTitleText(tip, true)
+		end
+		local status = UnitIsAFK(unit) and ' |cFF9E6100[AFK]' or UnitIsDND(unit) and ' |cFF9E0000[DND]' or  UnitIsConnected(unit) and '' or ' |cFF616161[DC]'
+		tip:AddDoubleLine(('%s|c%s%s%s|r'):format(UnitIcon(unit), class_color, name, status), ' ')
+		if not InspectFrame:IsShown() and CanInspect(unit) then
+			NotifyInspect(unit)
+			tip:RegisterEvent('INSPECT_READY')
+		end
+		local guild, title, rank = GetGuildInfo(unit)
+		if guild then
+			tip:AddDoubleLine(('|cFF9E9E00<%s>|r'):format(guild), ('|cFF9E9E9E%s|cFF616161(%s)|r'):format(title, rank))
+		end
+		tip:AddDoubleLine( ('|cFF9E9E9E%s |c%s%s|r'):format(level or '??', class_color, class), ('|cFF9E9E9E%s%s|r'):format(UnitRace(unit) or '', sex == 2 and'♂' or sex == 3 and '♀' or ''), GetQuestDifficultyColor(level) )
+		local faction, Lfaction = UnitFactionGroup(unit)
+		if faction then
+			tip:AddDoubleLine(('|cFF%s%s|r'):format(faction == 'Alliance' and '00619E' or faction == 'Horde' and '9E0000' or '009E00', Lfaction), ('|cFF9E9E9E%s|r'):format(realm))
+		end
+		if location and not location:match(Lfaction) then
+			tip:AddLine(('|cFF9E9E00%s|r'):format(location))
+		end
+	else
+		local discription = tip.TextLeft2:GetText()
+		if not discription or discription:find(LEVEL) then
+			discription = nil
+		end
+		if UnitIsBattlePet(unit) then
+			name = tip.TextLeft1:GetText()
+			level = UnitBattlePetLevel(unit)
+			tip:ClearLines()
+			if discription then
+				tip:AddLine(('|cFF9E9E9E%s|r'):format(discription))
+				SetTitleText(tip, true)
+			end
+			tip:AddDoubleLine(('%s%s'):format(UnitIcon(unit), name), _G['BATTLE_PET_DAMAGE_NAME_'..UnitBattlePetType(unit)])
+			tip:AddDoubleLine( ('|cFF9E9E9E%s |c%s%s|r'):format(level or '??', class_color, class), ('|cFF9E9E9E%s%s%s|r'):format(UnitCreatureType(unit) or '', UnitCreatureFamily(unit) or '', sex == 2 and'♂' or sex == 3 and '♀' or ''))
+		else
+			for i = 4, tip:NumLines() do
+				local text = _G['GameTooltipTextLeft'..i]:GetText()	
+				if text:find('%d+/%d+') then
+					CACHE(text)
+				end
+			end
+			tip:ClearLines()
+			if discription then
+				tip:AddLine(('|cFF9E9E9E%s|r'):format(discription))
+				SetTitleText(tip, true)
+			end
+			local classification =  UnitClassification(unit):find('rare') and '稀有'
+			tip:AddDoubleLine(('%s%s%s|r'):format(UnitIcon(unit), HexColor(FACTION_BAR_COLORS[UnitReaction(unit, 'player')]), name), classification)
+			if level == -1 then
+				level = '|cFF9E0000BOSS'
+			end
+			tip:AddDoubleLine( ('|cFF9E9E9E%s |c%s%s|r'):format(level or '??', class_color, class), ('|cFF9E9E9E%s%s%s|r'):format(UnitCreatureType(unit) or '', UnitCreatureFamily(unit) or '', sex == 2 and'♂' or sex == 3 and '♀' or ''))
+
+			if #CACHE > 0 then
+				tip:AddLine(' ')
+				for key, text in pairs(CACHE) do
+					local name, progress, count = text:match('^ ([^ ]-) ?%- (.+)%p(%d+/%d+)$') --local playerName, progress = strmatch(text, '^ ([^ ]-) ?%- (.+)$')
+					name = name == '' and PLAYER_NAME or name or print("["..name.."]")
+					local color = GetClass(name)
+					tip:AddDoubleLine(progress, ('|c%s%s|r - %s'):format(color, name, count), .62, .62, .62, .62, .62, .62)
+				end
+				wipe(CACHE)
+			end
+		end
+	end
+
+	if UnitExists(unit..'target') then
+		tip:AddLine(' ')
+		tip:AddLine(('@%s'):format(UnitTarget(unit..'target')))
+	end
+end
+GameTooltip:HookScript('OnTooltipSetUnit', SetUnit)
+GameTooltip:HookScript('OnHide', SetTitleText)

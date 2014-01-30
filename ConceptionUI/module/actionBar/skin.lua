@@ -14,14 +14,13 @@ local function Skin(self)
 
 	self:SetSize(26, 26)
 
-	local normal = self:GetNormalTexture()
-	if normal then
-		normal:SetTexture(TEXTURE.buttonOverlay)
-		normal:SetVertexColor(0, 0, 0, 1)
-		normal:ClearAllPoints()
-		normal:SetAllPoints()
+	self.normal_texture = self:GetNormalTexture()
+	if self.normal_texture then
+		self.normal_texture:SetTexture(TEXTURE.buttonOverlay)
+		self.normal_texture:SetVertexColor(0, 0, 0, 1)
+		self.normal_texture:ClearAllPoints()
+		self.normal_texture:SetAllPoints()
 	end
-	self.normal_texture = normal
 
 	local pushed = self:GetPushedTexture()
 	if pushed then
@@ -94,17 +93,15 @@ local function Skin(self)
 		normal2:SetAlpha(0)
 	end
 
-	local flyoutBorder = self.FlyoutBorder
-	if flyoutBorder then
-		flyoutBorder:SetTexture(nil)
+	if self.FlyoutBorder then
+		self.FlyoutBorder:SetTexture(nil)
 	end
 
-	local flyoutBorderShadow = self.FlyoutBorderShadow
-	if flyoutBorderShadow then
-		flyoutBorderShadow:SetTexture(nil)
+	if self.FlyoutBorderShadow then
+		self.FlyoutBorderShadow:SetTexture(nil)
 	end
 
-	--local flyoutArrow = self.FlyoutArrow
+	--self.FlyoutArrow
 
 	if not self.shadowFrame then
 		self.shadowFrame = CreateFrame('Frame', nil, self)
@@ -125,33 +122,49 @@ local function Skin(self)
 		self.borderFrame:SetBackdrop(TEXTURE.buttonBorder)
 		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
 	end
+
+	self:SetAttribute('showgrid', 1)
+	self:SetAttribute('statehidden', nil)
+	self:Show()
  end
 hooksecurefunc('ActionButton_Update', Skin)
 hooksecurefunc('PetActionButton_OnEvent', Skin)
 
 local IsEquippedAction, IsConsumableAction = IsEquippedAction, IsConsumableAction
-local function UpdateActionButton(self)
+local function UpdateAction(self)
 	if not self.normal_texture then return end
 	self.normal_texture:SetVertexColor(0, 0, 0, 1)
-	local action = self.action
-	if IsConsumableAction(action) then
-		local count = tonumber(self.count:GetText())
-		if count == 0 then
+	if IsConsumableAction(self.action) then
+		if self.count:GetText() == '0' then
 			self.borderFrame:SetBackdropBorderColor(.6, .1, .1, 1)
+			return
 		else
 			self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+			return
 		end
-		return
-	elseif IsEquippedAction(action) then
+	elseif IsEquippedAction(self.action) then
 		self.borderFrame:SetBackdropBorderColor(.1, .6, .1, 1)
 		return
 	else
 		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
 	end
 end
-hooksecurefunc('ActionButton_Update', UpdateActionButton)
-hooksecurefunc('ActionButton_ShowGrid', UpdateActionButton)
-hooksecurefunc('ActionButton_UpdateUsable', UpdateActionButton)
+hooksecurefunc('ActionButton_Update', UpdateAction)
+hooksecurefunc('ActionButton_UpdateUsable', UpdateAction)
+hooksecurefunc('ActionButton_ShowGrid', UpdateAction)
+
+local ActionHasRange, IsActionInRange = ActionHasRange, IsActionInRange --local usable, oom = IsUsableAction(self.action)
+local function UpdateActioRange(self)
+	if not self.borderFrame then return end
+	if not ActionHasRange(self.action) or self.count:GetText()=='0' then return end
+	if IsActionInRange(self.action)~=0 then
+		self.borderFrame:SetBackdropBorderColor(.1, .1, .1, 1)
+		return
+	else
+		self.borderFrame:SetBackdropBorderColor(.6, .1, .1, 1)
+	end
+end
+hooksecurefunc('ActionButton_OnUpdate', UpdateActioRange)
 
 local function UpdatePetActionButton(self)
 	for i = 1, 10 do

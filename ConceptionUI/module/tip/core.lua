@@ -45,6 +45,7 @@ local enable = {
 	['BNplayer'] = false,
 	['battlepet'] = false,
 }
+
 local function OnHyperlinkEnter(self, data, link)
 	if not enable[data:match('^(.-):.-$')] then return end
 	GameTooltip:SetOwner(self, 'ANCHOR_TOPLEFT')
@@ -57,12 +58,15 @@ for i = 1, NUM_CHAT_WINDOWS do
 end
 
 
-local function hookCompareItems(tip)
-	local CompareItem = tip.SetHyperlinkCompareItem
-	tip.SetHyperlinkCompareItem = function(self, link, index, shift, main, ...)
-		return CompareItem(self, link, index)
-	end
+local function Simple(self, link, index, ...)
+	return self.CompareItem(self, link, index)
 end
+
+local function hookCompareItems(tip)
+	tip.CompareItem = tip.SetHyperlinkCompareItem
+	tip.SetHyperlinkCompareItem = Simple
+end
+
 hookCompareItems(ShoppingTooltip1)
 hookCompareItems(ShoppingTooltip2)
 hookCompareItems(ShoppingTooltip3)

@@ -14,7 +14,7 @@ NAMEPLATE.class = setmetatable({}, {
 		end
 		return COLOR[class].r, COLOR[class].g, COLOR[class].b, class
 	end,
-
+	__mode = 'kv'
 })
 
 function NAMEPLATE:CheckClass(unit)

@@ -30,103 +30,82 @@ function NAMEPLATE:Skin(plate)
 	if plate.skined then return end
 	plate.skined = true
 
-	local healthbar = CreateFrame('StatusBar', nil, plate)
-		healthbar:SetStatusBarTexture(texture)
-		healthbar:SetSize(plate_width, healthbar_height)
-		healthbar:SetPoint('CENTER', plate, 'CENTER')
-		plate.healthbar = healthbar
+	plate.healthbar = CreateFrame('StatusBar', nil, plate)
+	plate.healthbar:SetStatusBarTexture(texture)
+	plate.healthbar:SetSize(plate_width, healthbar_height)
+	plate.healthbar:SetPoint('CENTER', plate, 'CENTER')
+	plate.bg = CreateFrame('Frame', nil, plate.healthbar)
+	plate.bg:SetBackdrop(backdrop)
+	plate.bg:SetPoint('TOPLEFT', -backdrop_size, backdrop_size)
+	plate.bg:SetPoint('BOTTOMRIGHT', backdrop_size, -backdrop_size)
+	plate.bg:SetFrameLevel(plate.healthbar:GetFrameLevel() -1 > 0 and plate.healthbar:GetFrameLevel() -1 or 0)
+	plate.bg:SetBackdropColor(0, 0, 0, 0)
+	plate.bg:SetBackdropBorderColor(0, 0, 0, 0)
+	plate.castbar = CreateFrame('StatusBar', nil, plate)
+	plate.castbar:SetStatusBarTexture(texture)
+	plate.castbar:SetSize(plate_width, castbar_height)
+	plate.castbar:SetPoint('TOP', plate.healthbar, 'BOTTOM', 0, -bar_gap)
+	plate.castbar.bg = plate.castbar:CreateTexture(nil, 'BACKGROUND')
+	plate.castbar.bg:SetTexture(0, 0, 0, 1)
+	plate.castbar.bg:SetAllPoints(plate.castbar)
+	plate.castbar:Hide()
+	plate.id = plate:CreateFontString()
+	plate.id:SetFont(name_font, name_size, 'OUTLINE')
+	plate.id:SetPoint('BOTTOM', plate.healthbar, 'TOP', 0, name_offset)
+	plate.hp = plate:CreateFontString()
+	plate.hp:SetPoint('LEFT', plate.id, 'RIGHT', hp_offset, 0)
+	plate.hp:SetFont(numb_font, numb_size, 'OUTLINE')
+	plate.lv = plate:CreateFontString()
+	plate.lv:SetPoint('RIGHT', plate.id, 'LEFT', lv_offset, 0)
+	plate.lv:SetFont(numb_font, numb_size, 'OUTLINE')
 
-	local bg = CreateFrame('Frame', nil, healthbar)
-		bg:SetBackdrop(backdrop)
-		bg:SetPoint('TOPLEFT', -backdrop_size, backdrop_size)
-		bg:SetPoint('BOTTOMRIGHT', backdrop_size, -backdrop_size)
-		bg:SetFrameLevel(healthbar:GetFrameLevel() -1 > 0 and healthbar:GetFrameLevel() -1 or 0)
-		bg:SetBackdropColor(0, 0, 0, 0)
-		bg:SetBackdropBorderColor(0, 0, 0, 0)
-		plate.bg = bg
+	plate.barFrame, plate.nameFrame = plate:GetChildren()
 
-	local castbar = CreateFrame('StatusBar', nil, plate)
-		castbar:SetStatusBarTexture(texture)
-		castbar:SetSize(plate_width, castbar_height)
-		castbar:SetPoint('TOP', healthbar, 'BOTTOM', 0, -bar_gap)
-		castbar.bg = castbar:CreateTexture(nil, 'BACKGROUND')
-		castbar.bg:SetTexture(0, 0, 0, 1)
-		castbar.bg:SetAllPoints(castbar)
-		castbar:Hide()
+	plate.old_healthbar, plate.old_castbar = plate.barFrame:GetChildren()
 
-	local id = plate:CreateFontString()
-		id:SetFont(name_font, name_size, 'OUTLINE')
-		id:SetPoint('BOTTOM', healthbar, 'TOP', 0, name_offset)
-		plate.id = id
+	plate.old_healthbar:Hide()
+	plate.old_healthbar.old_healthbar = plate.old_healthbar
+	plate.old_healthbar.healthbar = plate.healthbar
+	plate.old_healthbar.hp = plate.hp
+	plate.old_healthbar:HookScript('OnValueChanged', NAMEPLATE.CheckHealth)
 
-	local hp = plate:CreateFontString()
-		hp:SetPoint('LEFT', id, 'RIGHT', hp_offset, 0)
-		hp:SetFont(numb_font, numb_size, 'OUTLINE')
-		plate.hp = hp
+	plate.old_castbar.castbar = plate.castbar
+	plate.old_castbar:HookScript('OnShow', NAMEPLATE.ShowCastBar)
+	plate.old_castbar:HookScript('OnHide', NAMEPLATE.HideCastbar)
+	plate.old_castbar:HookScript('OnValueChanged', NAMEPLATE.CheckCast)
 
-	local lv = plate:CreateFontString()
-		lv:SetPoint('RIGHT', id, 'LEFT', lv_offset, 0)
-		lv:SetFont(numb_font, numb_size, 'OUTLINE')
-		plate.lv = lv
+	plate.old_castbar.castbarTexture, plate.old_castbar.castbarOverlay, plate.old_castbar.shield, plate.old_castbar.spellIcon, plate.old_castbar.spellName, plate.old_castbar.castbarShadow = plate.old_castbar:GetRegions()
 
-	local barFrame, nameFrame = plate:GetChildren()
-	local old_healthbar, old_castbar = barFrame:GetChildren()
+	plate.old_castbar.castbarTexture:SetTexture(nil)
+	plate.old_castbar.castbarOverlay:SetTexture(nil)
+	plate.old_castbar.shield:SetTexture(nil)
+	plate.old_castbar.spellIcon:SetTexCoord(.1, .9, .1, .9)
+	plate.old_castbar.spellIcon:SetSize(spellicon_size, spellicon_size)
+	plate.old_castbar.spellIcon:ClearAllPoints()
+	plate.old_castbar.spellIcon:SetPoint('TOPRIGHT', plate.old_castbar.spellName, 'TOPLEFT', -1, -.5)
+	plate.old_castbar.spellName:SetFont(name_font, numb_size, 'OUTLINE')
+	plate.old_castbar.spellName:ClearAllPoints()
+	plate.old_castbar.spellName:SetPoint('TOP', plate.castbar, 'BOTTOM', .5*spellicon_size, -1)
+	plate.old_castbar.castbarShadow:SetTexture(nil)
 
-		old_healthbar:HookScript('OnValueChanged', NAMEPLATE.CheckHealth)
-		old_healthbar:Hide()
-		old_healthbar.old_healthbar = old_healthbar
-		old_healthbar.healthbar = healthbar
-		old_healthbar.hp = hp
-		plate.old_healthbar = old_healthbar
+	plate.old_castbar.iconShadow = plate.old_castbar:CreateTexture(nil, 'BACKGROUND')
+	plate.old_castbar.iconShadow:SetTexture(buttonShadow)
+	plate.old_castbar.iconShadow:SetPoint('TOPLEFT', plate.old_castbar.spellIcon, 'TOPLEFT', -2, 2)
+	plate.old_castbar.iconShadow:SetPoint('BOTTOMRIGHT', plate.old_castbar.spellIcon, 'BOTTOMRIGHT', 2, -2)
+	plate.old_castbar.iconShadow:SetVertexColor(1, 1, 1, 1)
 
-		old_castbar:HookScript('OnValueChanged', NAMEPLATE.CheckCast)
-		old_castbar:HookScript('OnShow', NAMEPLATE.ShowCastBar)
-		old_castbar:HookScript('OnHide', NAMEPLATE.HideCastbar)
-		old_castbar.castbar = castbar
+	plate.threatGlow, plate.healthbarOverlay, plate.highlight, plate.level, plate.boss, plate.raidicon, plate.elite = plate.barFrame:GetRegions()
+	plate.threatGlow:SetTexture(nil)
+	plate.healthbarOverlay:Hide()
+	plate.highlight:SetTexture(nil)
+	plate.boss:SetTexture(nil)
+	plate.raidicon:ClearAllPoints()
+	plate.raidicon:SetPoint('TOP', plate.healthbar, 0, raidicon_offset)
+	plate.raidicon:SetSize(raidicon_size, raidicon_size)
+	plate.elite:SetAlpha(0)
 
-	local threatGlow, healthbarOverlay, highlight, level, boss, raidicon, elite = barFrame:GetRegions()
-
-		threatGlow:SetTexture(nil)
-		plate.threatGlow = threatGlow
-		healthbarOverlay:Hide()
-		highlight:SetTexture(nil)
-		plate.highlight = highlight
-		plate.level = level
-		boss:SetTexture(nil)
-		plate.boss = boss
-		raidicon:ClearAllPoints()
-		raidicon:SetPoint('TOP', healthbar, 0, raidicon_offset)
-		raidicon:SetSize(raidicon_size, raidicon_size)
-		elite:SetAlpha(0)
-		plate.elite = elite
-
-	local castbarTexture, castbarOverlay, shield, spellIcon, spellName, castbarShadow = old_castbar:GetRegions()
-
-		castbarTexture:SetTexture(nil)
-		castbarOverlay:SetTexture(nil)
-		shield:SetTexture(nil)
-		old_castbar.shield = shield
-		spellIcon:SetTexCoord(.1, .9, .1, .9)
-		spellIcon:SetSize(spellicon_size, spellicon_size)
-		spellIcon:ClearAllPoints()
-		spellIcon:SetPoint('TOPRIGHT', spellName, 'TOPLEFT', -1, -.5)
-		old_castbar.spellIcon = spellIcon
-		spellName:SetFont(name_font, numb_size, 'OUTLINE')
-		spellName:ClearAllPoints()
-		spellName:SetPoint('TOP', castbar, 'BOTTOM', .5*spellicon_size, -1)
-		old_castbar.spellName = spellName
-		castbarShadow:SetTexture(nil)
-
-		castbar.icon_shadow = old_castbar:CreateTexture(nil, 'BACKGROUND')
-		castbar.icon_shadow:SetTexture(buttonShadow)
-		castbar.icon_shadow:SetPoint('TOPLEFT', spellIcon, 'TOPLEFT', -2, 2)
-		castbar.icon_shadow:SetPoint('BOTTOMRIGHT', spellIcon, 'BOTTOMRIGHT', 2, -2)
-		castbar.icon_shadow:SetVertexColor(1, 1, 1, 1)
-
-	local old_name = nameFrame:GetRegions()
-
-		old_name:Hide()
-		plate.old_name = old_name
+	plate.old_name = plate.nameFrame:GetRegions()
+	plate.old_name:Hide()
 
 	plate.CheckColor = self.CheckColor
 	plate.CheckThreat = self.CheckThreat

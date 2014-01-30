@@ -4,26 +4,33 @@ function D.LOAD.I:LoadCombatEventCFG()
 	
 		--ex:[玩家] > [技能]
 		CFG['common'] = {
-		-- BG
-			[43987]  = true, -- Conjure Refreshment Table
+		-- RAID
 			[29893]  = true, -- Soulwell
+			[43987]  = true, -- Conjure Refreshment Table
+		-- BG
 			[23034]  = true, -- Alliance Battle Standard
 			[23035]  = true, -- Horde Battle Standard
 		-- Engineering
-			[54735]  = true, -- 
 			[22700]  = true, -- Field Repair Bot 74A
 			[44389]  = true, -- Field Repair Bot 110G
 			[54711]  = true, -- Scrapbot Construction Kit
 			[67826]  = true, -- Jeeves
 			[54710]  = true, -- MOLL-E
-		-- Damn Toys
+			[54735]  = true, -- Electromagnetic Pulse
+			[94794]  = true, -- Rocket Fuel Leak
+		-- Toys
 			[61031]  = true, -- Toy Train Set
 			[62949]  = true, -- Wind-Up Train Wrecker
 			[133371] = true, -- Stackable Stag
 			[128275] = true, -- Cremating Torch
 			[131585] = true, -- Gin-Ji Knife Set
+			[127320] = true, -- Magic Banana
 			[140271] = true, -- Ra'sha's Sacrificial Dagger
-			[71909] = true,
+			[131510] = true, -- Cracked Talisman
+			[71909]  = true, -- The Heartbreaker
+			[131493] = true, -- B. F. F. Necklace
+			[129023] = true, -- Krastinov's Bag of Horrors
+			[128328] = true, -- Ken-Ken's Mask
 		-- Banquets
 			[104958] = true, -- Pandaren Banquet
 			[105193] = true, -- Great Pandaren Banquet

@@ -42,7 +42,7 @@ NAMEPLATE:SetScript('OnEvent', function(self, event)
 	SetCVar('bloatnameplates', 0)
 	SetCVar('bloatthreat', 0)
 	SetCVar('bloattest', 0)
-	self.plates = {}
+	self.plates = setmetatable({}, {__mode = 'kv'})
 	self.ENGINE:Play()
 	self.realm = GetRealmName('player')
 	self.faction = UnitFactionGroup("player")

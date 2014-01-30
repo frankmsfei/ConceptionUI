@@ -56,7 +56,7 @@ local function SkinBar(self)
 	self.bar_icon1:SetTexCoord(.08, .92, .08, .92)
 	self.bar_icon1:SetDrawLayer('ARTWORK')
 	self.bar_icon1:ClearAllPoints()
-	self.bar_icon1:SetPoint('RIGHT', self.bar, 'LEFT', -3, 0)
+	self.bar_icon1:SetPoint('RIGHT', self.bar, 'LEFT', -6, 0)
 	self.bar_icon1:Show()
 
 	self.bar_icon1.overlay = self.bar_icon1.overlay or self.bar:CreateTexture(nil, 'OVERLAY')
@@ -75,7 +75,7 @@ local function SkinBar(self)
 	self.bar_icon2:SetTexCoord(.08, .92, .08, .92)
 	self.bar_icon2:SetDrawLayer('ARTWORK')
 	self.bar_icon2:ClearAllPoints()
-	self.bar_icon2:SetPoint('LEFT', self.bar, 'RIGHT', 3, 0)
+	self.bar_icon2:SetPoint('LEFT', self.bar, 'RIGHT', 6, 0)
 	self.bar_icon2:Hide()
 
 	self.bar_icon2.overlay = self.bar_icon2.overlay or self.bar:CreateTexture(nil, 'OVERLAY')
@@ -149,15 +149,21 @@ local function OnEvent()
 	DBT_SavedOptions['DBM'].TimerPoint = 'LEFT'
 	DBT_SavedOptions['DBM'].TimerX = 132
 	DBT_SavedOptions['DBM'].TimerY = 0
-	DBT_SavedOptions['DBM'].HugeTimerPoint = 'CENTER'
+	DBT_SavedOptions['DBM'].HugeTimerPoint = 'TOP'
 	DBT_SavedOptions['DBM'].HugeTimerX = 0
-	DBT_SavedOptions['DBM'].HugeTimerY = 320
-	DBM_SavedOptions.SpecialWarningPoint = 'CENTER'
-	DBM_SavedOptions.SpecialWarningX = 0
-	DBM_SavedOptions.SpecialWarningY = 250
-	DBM_SavedOptions.LTSpecialWarningPoint = 'CENTER'
+	DBT_SavedOptions['DBM'].HugeTimerY = -140
+
+	DBM_SavedOptions.LTSpecialWarningPoint = 'TOP'
 	DBM_SavedOptions.LTSpecialWarningX = 0
-	DBM_SavedOptions.LTSpecialWarningY = 140
+	DBM_SavedOptions.LTSpecialWarningY = -100
+
+	DBM_SavedOptions.SpecialWarningPoint = 'TOP'
+	DBM_SavedOptions.SpecialWarningX = 0
+	DBM_SavedOptions.SpecialWarningY = -200
+
+	DBM_SavedOptions.RaidWarningPosition.Point = 'TOP'
+	DBM_SavedOptions.RaidWarningPosition.X = 0
+	DBM_SavedOptions.RaidWarningPosition.Y = -300
 
 	RaidWarningFrame.slot1:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
 	RaidWarningFrame.slot1:SetShadowOffset(0, 0)
