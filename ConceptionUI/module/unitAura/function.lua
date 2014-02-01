@@ -16,6 +16,11 @@ C.FUNC.AURA = {
 }
 
 local AURA = C.AURAFRAME
+--local CACHE = setmetatable({}, {__mode='kv',
+--	__call = function(self, key)
+
+--	end
+--})
 
 local function GetDispelTypeColor(dispelType)
 	if not dispelType then
@@ -32,7 +37,8 @@ local function GetDispelTypeColor(dispelType)
 	end
 end
 
-local function showAura(self, icon, stack, dispelType, expiration, desaturated, debuff)
+local function showAura(self, name, icon, stack, dispelType, expiration, desaturated, debuff, sort)
+	self.name = name
 	self.icon.overlay:Show()
 	self.icon:SetTexture(icon)
 	self.icon:SetDesaturated(desaturated)
@@ -42,25 +48,33 @@ local function showAura(self, icon, stack, dispelType, expiration, desaturated, 
 	self.shadow:Show()
 	self.stack:SetText(stack and stack>1 and stack or '')
 	self.expiration = expiration or 0
-	if expiration ~= 0 then return end
-	self.timer:SetText(nil)
+	--if expiration ~= 0 then return end
+	--self.timer:SetText(nil)
 end
-local function hideAura(self)
+
+local function hideAura(self, sort)
 	if not self.icon:GetTexture() then return end
 	self.icon.overlay:Hide()
 	self.shadow:Hide()
+	self.name = nil
 	self.expiration = nil
 	self.icon:SetTexture(nil)
 	self.stack:SetText(nil)
 	self.timer:SetText(nil)
 end
 
+local function sortbuff(a, b)
+	if a.expiration and b.expiration then
+		return a.expiration > b.expiration
+	end
+end
+
 local UnitAura = UnitAura
-local UpdateAura = function(auras, unit, filter, debuff)
+local UpdateAura = function(auras, unit, filter, debuff, sort)
 	for i = 1, #auras do
-		local _, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
+		local name, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
 		if icon then
-			showAura(auras[i], icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
+			showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
 		else
 			hideAura(auras[i])
 		end
