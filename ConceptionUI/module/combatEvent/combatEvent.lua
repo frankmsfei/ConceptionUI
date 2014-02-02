@@ -302,10 +302,12 @@ function D.LOAD.M:LoadCombatEvent()
 		end
 	end
 
+	local collectgarbage = collectgarbage
 	function CombatEvent:PLAYER_REGEN_ENABLED()
 		self:UnregisterEvent('PLAYER_REGEN_ENABLED')
 		self:RegisterEvent('PLAYER_REGEN_DISABLED')
 		self:AddNotice(0, 1, 0, '- COMBAT -')
+		collectgarbage('collect')
 		if self.HideFriendlyNameplatesInCombat then
 			SetCVar('nameplateShowFriends', 1)
 		end
@@ -336,7 +338,11 @@ function D.LOAD.M:LoadCombatEvent()
 		local NAMEPLATE = C.NAMEPLATE
 		if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
 			self.CHANNEL = 'INSTANCE_CHAT'
-			NAMEPLATE.group = 'raid%d'
+			if IsInRaid() then
+				NAMEPLATE.group = 'raid%d'
+			else
+				NAMEPLATE.group = 'party%d'
+			end
 		elseif IsInRaid() then
 			self.CHANNEL = 'RAID'
 			NAMEPLATE.group = 'raid%d'

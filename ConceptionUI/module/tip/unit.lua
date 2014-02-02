@@ -11,7 +11,7 @@ local UnitFactionGroup = UnitFactionGroup
 local UnitClassification = UnitClassification
 local UnitCreatureType, UnitCreatureFamily = UnitCreatureType, UnitCreatureFamily
 local UnitIsPlayer, UnitIsBattlePet = UnitIsPlayer, UnitIsBattlePet
-local UnitIsAFK, UnitIsDND, UnitIsConnected = UnitIsAFK, UnitIsDND, UnitIsConnected
+local UnitIsDeadOrGhost, UnitIsAFK, UnitIsDND, UnitIsConnected = UnitIsDeadOrGhost, UnitIsAFK, UnitIsDND, UnitIsConnected
 local GetGuildInfo = GetGuildInfo
 local GetRaidTargetIndex = GetRaidTargetIndex
 local IsAltKeyDown = IsAltKeyDown -- debug
@@ -85,6 +85,7 @@ local function SetUnit(tip)
 	local class_color, class = GetClass(unit)
 	local level = UnitLevel(unit)
 	local sex = UnitSex(unit)
+	local dead = UnitIsDeadOrGhost(unit)
 	local location = nil
 	if tip.TextLeft3:GetText() and not tip.TextLeft3:GetText():find(LEVEL) and not tip.TextLeft3:GetText():find(PVP) then
 		location = tip.TextLeft3:GetText()
@@ -101,7 +102,7 @@ local function SetUnit(tip)
 			tip:AddLine(('|cFF9E9E9E%s|r'):format(title))
 			SetTitleText(tip, true)
 		end
-		local status = UnitIsAFK(unit) and ' |cFF9E6100[AFK]' or UnitIsDND(unit) and ' |cFF9E0000[DND]' or  UnitIsConnected(unit) and '' or ' |cFF616161[DC]'
+		local status = dead and ' |cFF616161[DEAD]' or UnitIsAFK(unit) and ' |cFF9E6100[AFK]' or UnitIsDND(unit) and ' |cFF9E0000[DND]' or  UnitIsConnected(unit) and '' or ' |cFF616161[DC]'
 		tip:AddDoubleLine(('%s|c%s%s%s|r'):format(UnitIcon(unit), class_color, name, status), ' ')
 		if not InspectFrame:IsShown() and CanInspect(unit) then
 			NotifyInspect(unit)
@@ -116,7 +117,7 @@ local function SetUnit(tip)
 		if faction then
 			tip:AddDoubleLine(('|cFF%s%s|r'):format(faction == 'Alliance' and '00619E' or faction == 'Horde' and '9E0000' or '009E00', Lfaction), ('|cFF9E9E9E%s|r'):format(realm))
 		end
-		if location and not location:match(Lfaction) then
+		if location and Lfaction and not location:match(Lfaction) then
 			tip:AddLine(('|cFF9E9E00%s|r'):format(location))
 		end
 	else
@@ -132,7 +133,7 @@ local function SetUnit(tip)
 				tip:AddLine(('|cFF9E9E9E%s|r'):format(discription))
 				SetTitleText(tip, true)
 			end
-			tip:AddDoubleLine(('%s%s'):format(UnitIcon(unit), name), _G['BATTLE_PET_DAMAGE_NAME_'..UnitBattlePetType(unit)])
+			tip:AddDoubleLine(('%s%s%s'):format(UnitIcon(unit), name, dead and ' |cFF616161[DEAD]|r' or ''), _G['BATTLE_PET_DAMAGE_NAME_'..UnitBattlePetType(unit)])
 			tip:AddDoubleLine( ('|cFF9E9E9E%s |c%s%s|r'):format(level or '??', class_color, class), ('|cFF9E9E9E%s%s%s|r'):format(UnitCreatureType(unit) or '', UnitCreatureFamily(unit) or '', sex == 2 and'♂' or sex == 3 and '♀' or ''))
 		else
 			for i = 4, tip:NumLines() do
@@ -147,7 +148,7 @@ local function SetUnit(tip)
 				SetTitleText(tip, true)
 			end
 			local classification =  UnitClassification(unit):find('rare') and '稀有'
-			tip:AddDoubleLine(('%s%s%s|r'):format(UnitIcon(unit), HexColor(FACTION_BAR_COLORS[UnitReaction(unit, 'player')]), name), classification)
+			tip:AddDoubleLine(('%s%s%s%s|r'):format(UnitIcon(unit), HexColor(FACTION_BAR_COLORS[UnitReaction(unit, 'player')]), name, dead and ' |cFF616161[DEAD]' or ''), classification)
 			if level == -1 then
 				level = '|cFF9E0000BOSS'
 			end
@@ -156,10 +157,10 @@ local function SetUnit(tip)
 			if #CACHE > 0 then
 				tip:AddLine(' ')
 				for key, text in pairs(CACHE) do
-					local name, progress, count = text:match('^ ([^ ]-) ?%- (.+)%p(%d+/%d+)$') --local playerName, progress = strmatch(text, '^ ([^ ]-) ?%- (.+)$')
-					name = name == '' and PLAYER_NAME or name or print("["..name.."]")
+					local name, progress, count = text:match('^ ([^ ]-) ?%- (.+)%p%s-(%d+/%d+)$') --local playerName, progress = strmatch(text, '^ ([^ ]-) ?%- (.+)$')
+					name = name == '' and PLAYER_NAME or name
 					local color = GetClass(name)
-					tip:AddDoubleLine(progress, ('|c%s%s|r - %s'):format(color, name, count), .62, .62, .62, .62, .62, .62)
+					tip:AddDoubleLine(progress, ('|c%s%s|r - %s'):format(color, name, count or ''), .62, .62, .62, .62, .62, .62)
 				end
 				wipe(CACHE)
 			end
