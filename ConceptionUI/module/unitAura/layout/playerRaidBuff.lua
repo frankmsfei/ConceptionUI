@@ -20,6 +20,10 @@ function D.LOAD.I:LoadPlayerRaidBuff()
 		return a
 	end
 
+	--local function OnClick(self)
+	--	return CancelUnitBuff('player', self.name)
+	--end
+
 	local function OnEnter(self)
 		return func.OnEnter(self, 'player', 'HELPFUL')
 	end
@@ -30,6 +34,7 @@ function D.LOAD.I:LoadPlayerRaidBuff()
 	for i = 1, cfg.amount do
 		F[i] = CreateAura('ConceptionUI PlayerRaidBuff', i, F)
 		F[i]:SetScript('OnEnter', OnEnter)
+		--F[i]:SetScript('OnClick', OnClick)
 	end
 
 	C.AURAFRAME['PlayerRaidBuff'] = F

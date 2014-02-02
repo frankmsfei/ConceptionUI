@@ -1,3 +1,4 @@
+local unpack = unpack
 local C = unpack(select(2, ...))
 
 local Tip = GameTooltip
@@ -16,26 +17,16 @@ C.FUNC.AURA = {
 }
 
 local AURA = C.AURAFRAME
---local CACHE = setmetatable({}, {__mode='kv',
---	__call = function(self, key)
-
---	end
---})
-
-local function GetDispelTypeColor(dispelType)
-	if not dispelType then
-		return .618, 0, 0
+local CACHE = setmetatable({}, {__mode='kv',
+	__call = function(self, key)
+		table.insert(self, key)--setmetatable(key, {__mode='kv'}))
 	end
-	if dispelType == 'Disease' then
-		return 0, .618, .191
-	elseif dispelType == 'Curse' then
-		return .618, 0, .618
-	elseif dispelType == 'Magic' then
-		return 0, .191, .618
-	elseif dispelType == 'Poison' then
-		return .618, .618, 0
-	end
-end
+})
+
+local DEBUFF_COLOR = setmetatable({['Disease'] = {0, .618, .191}, ['Poison'] = {.618, .618, 0}, ['Magic'] = {0, .191, .618}, ['Curse'] = {.618, 0, .618}, ['None'] = {.618, 0, 0}}, {
+		__index = function(self) return self['None'] end,
+		__call = function(self, key) return self[key] end
+	})
 
 local function showAura(self, name, icon, stack, dispelType, expiration, desaturated, debuff, sort)
 	self.name = name
@@ -43,7 +34,7 @@ local function showAura(self, name, icon, stack, dispelType, expiration, desatur
 	self.icon:SetTexture(icon)
 	self.icon:SetDesaturated(desaturated)
 	if debuff then
-		self.shadow:SetBackdropBorderColor(GetDispelTypeColor(dispelType))
+		self.shadow:SetBackdropBorderColor(unpack(DEBUFF_COLOR(dispelType)))
 	end
 	self.shadow:Show()
 	self.stack:SetText(stack and stack>1 and stack or '')
@@ -64,26 +55,43 @@ local function hideAura(self, sort)
 end
 
 local function sortbuff(a, b)
-	if a.expiration and b.expiration then
+	if a.expiration == 0 and b.expiration > 0 then
+		return true
+	elseif a.expiration > 0 and b.expiration == 0 then
+		return false
+	else
 		return a.expiration > b.expiration
 	end
 end
 
 local UnitAura = UnitAura
 local UpdateAura = function(auras, unit, filter, debuff, sort)
+	if sort then wipe(CACHE) end
 	for i = 1, #auras do
 		local name, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
 		if icon then
-			showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
+			if sort then
+				CACHE({['id'] = i, ['expiration'] = expiration})
+			else
+				showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
+			end
 		else
 			hideAura(auras[i])
 		end
+	end
+	if sort then
+		table.sort(CACHE, sortbuff)
+		for i = 1, #CACHE do
+			local name, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, CACHE[i].id, filter)
+			showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
+		end
+		wipe(CACHE)
 	end
 end
 
 local m, h, d = 1/60, 1/3600, 1/216000
 local function time_format(sec)
-	if sec < 0 then
+	if sec <= 0 then
 		return '', nil
 	elseif sec < 1 then
 		return '|cFF9E0000%.1f|r', sec
@@ -102,9 +110,8 @@ end
 
 local function UpdateTimer(auras, curTime)
 	for i = 1, #auras do
-		local expiration = auras[i].expiration
-		if not expiration or expiration < 0 then return end -- only count the auras actual display
-		auras[i].timer:SetFormattedText(time_format(expiration - curTime))
+		if not auras[i].expiration then return end -- only count the auras actual display
+		auras[i].timer:SetFormattedText(time_format(auras[i].expiration - curTime))
 	end
 end
 
