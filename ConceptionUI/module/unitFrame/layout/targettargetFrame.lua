@@ -65,6 +65,3 @@ function D.LOAD.R:LoadTargetTargetFrame()
 	C.UNITFRAME.Minor['targettarget'] = F
 	RegisterUnitWatch(F)
 end
-
-
-
