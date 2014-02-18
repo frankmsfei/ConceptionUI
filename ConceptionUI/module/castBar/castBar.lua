@@ -56,6 +56,9 @@ Skin(TargetFrameSpellBar)
 TargetFrameSpellBar:SetPoint('Center', UIParent, 'CENTER', 0, -7)
 TargetFrameSpellBar:SetSize(180, 6)
 
+Skin(FocusFrameSpellBar)
+FocusFrameSpellBar:SetPoint('Center', UIParent, 'CENTER', -150, 110)
+FocusFrameSpellBar:SetSize(100, 1)
 
 local function Show(self)
 	self.spellName:SetText(self.text:GetText())
@@ -69,3 +72,4 @@ end
 hooksecurefunc(CastingBarFrame, 'Show', Show)
 hooksecurefunc(PetCastingBarFrame, 'Show', Show)
 hooksecurefunc(TargetFrameSpellBar, 'Show', Show)
+hooksecurefunc(FocusFrameSpellBar, 'Show', Show)
