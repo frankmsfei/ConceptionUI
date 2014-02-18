@@ -5,12 +5,15 @@ function D.LOAD.M:LoadCombatEvent()
 	local API, FUNC = D.API, C.FUNC.UNIT
 	local Frame, Icon, DropShadow, String = API.Frame, API.Icon, API.DropShadow, API.String
 	local cfg = D.CFG['COMBAT_EVENT']
+	local COMMON = cfg['common'] or {}
+	local SOS = cfg['sos'] or {}
+	local ColoredName = C.FUNC.UNIT.ColoredName
+	local UnitName, GetSpellLink = UnitName, GetSpellLink
+	local GetSpellTexture = GetSpellTexture
+	local print, tremove, pairs, unpack = print, tremove, pairs, unpack
 
-	local  function Finished(self)
+	local function Finished(self)
 		self.parent:Hide()
-		if self.ae then
-			self.ae = 0
-		end
 	end
 
 	local function CreateAni_H(frame)
@@ -45,7 +48,6 @@ function D.LOAD.M:LoadCombatEvent()
 			AG.moveOut:SetDuration(.1)
 			AG.moveOut:SetOrder(3)
 			
-			AG.ae = 0
 			AG.parent = frame
 			AG:SetScript('OnFinished', Finished)
 		return AG
@@ -74,39 +76,74 @@ function D.LOAD.M:LoadCombatEvent()
 	local function CreateAni_Scroll(frame)
 		local AG = frame:CreateAnimationGroup()
 			AG.fadeIni = AG:CreateAnimation('Alpha')
-			AG.fadeIni:SetChange(-1)
 			AG.fadeIni:SetDuration(0)
+			AG.fadeIni:SetChange(-1)
 			AG.fadeIni:SetOrder(0)
 			AG.moveIni = AG:CreateAnimation('Translation')
 			AG.moveIni:SetDuration(0)
+			AG.moveIni:SetOffset(0, 0)
 			AG.moveIni:SetOrder(0)
-			AG.moveIni:SetOffset(0, -100)
+
 			AG.moveUp = AG:CreateAnimation('Translation')
-			AG.moveUp:SetDuration(1.2)
-			AG.moveUp:SetOffset(0, 200)
+			AG.moveUp:SetDuration(3)
+			AG.moveUp:SetOffset(0, 140)
 			AG.moveUp:SetOrder(1)
-			AG.moveUp:SetSmoothing('IN_OUT')
+			AG.moveUp:SetSmoothing('OUT_IN')
+
 			AG.fadeIn = AG:CreateAnimation('Alpha')
-			AG.fadeIn:SetChange(.7)
-			AG.fadeIn:SetDuration(.2)
+			AG.fadeIn:SetDuration(.1)
+			AG.fadeIn:SetChange(1)
 			AG.fadeIn:SetOrder(1)
+
 			AG.fadeOut = AG:CreateAnimation('Alpha')
-			AG.fadeOut:SetStartDelay(.8)
+			AG.fadeOut:SetStartDelay(2.75)
+			AG.fadeOut:SetDuration(.25)
 			AG.fadeOut:SetChange(-1)
-			AG.fadeOut:SetDuration(.2)
-			AG.fadeOut:SetOrder(2)
+			AG.fadeOut:SetOrder(1)
+
 			AG.parent = frame
 			AG:SetScript('OnFinished', Finished)
 		return AG
 	end
 
+
+
+	local CombatEvent = CreateFrame('Frame', 'CombatEvent', C)
+		CombatEvent:RegisterEvent('PLAYER_LOGIN')
+		CombatEvent:SetScript('OnEvent', function(self, event, ...) self[event](self, ...) end)
+		--CombatEvent:Hide()
+		CombatEvent.EVENT_FRAME = {}
+		CombatEvent.EVENT_CACHE = {
+			['notification'] = setmetatable({}, {__mode = 'kv'}),
+			['player'] = setmetatable({}, {__mode = 'kv'}),
+			['playersub'] = setmetatable({}, {__mode = 'kv'}),
+			['target'] = setmetatable({}, {__mode = 'kv'}),
+			['targetsub'] = setmetatable({}, {__mode = 'kv'}),
+			['focus'] = setmetatable({}, {__mode = 'kv'}),
+			['focussub'] = setmetatable({}, {__mode = 'kv'}),
+			['targettarget'] = setmetatable({}, {__mode = 'kv'}),
+			['targettargetsub'] = setmetatable({}, {__mode = 'kv'}),
+			['pet'] = setmetatable({}, {__mode = 'kv'}),
+			['petsub'] = setmetatable({}, {__mode = 'kv'}),
+			['playerscroll'] = setmetatable({}, {__mode = 'kv'}),
+			['targetscroll'] = setmetatable({}, {__mode = 'kv'})
+		}
+
+	local function CheckDisplayCache(self)
+		if #self.cache == 0 then return end
+		CombatEvent:Display(self, unpack(self.cache[1]))
+		tremove(self.cache, 1)
+	end
+
 	local function CreateDisplay(parent, align1, align2, x, y, factor, scale)
 		local frame = Frame(nil, parent, align1, parent, align2, x*factor, y, 20, 20)
+			frame:Hide()
 			frame:SetScale(scale)
+			frame:SetFrameLevel(11)
 			frame.icon = Icon(frame, 20, 'ARTWORK')
 			frame.shadow = DropShadow(frame)
 			frame.shadow:SetBackdropBorderColor(0, 0, 0, 1)
-			frame.amount = String(frame, align1, frame, align2, 4*factor, 0, cfg.font, 20, cfg.fontFlag)
+			frame.amount = String(frame, align1, frame, align2, 4*factor, 0, cfg.font, 20, 'THICKOUTLINE')
 			frame.spellname = String(frame, align1, frame, align2, 4*factor, 0, cfg.spellname_font, 18, cfg.spellname_fontFlag)
 			frame.IN = CreateAni_H(frame)
 			frame.IN.moveIni:SetOffset(10*factor, 0)
@@ -118,75 +155,82 @@ function D.LOAD.M:LoadCombatEvent()
 			frame.OUT.moveIn:SetOffset(10*factor, 0)
 			frame.OUT.moveStay:SetOffset(2*factor, 0)
 			frame.OUT.moveOut:SetOffset(10*factor, 0)
-			frame:Hide()
+			frame:SetScript('OnHide', CheckDisplayCache)
 		return frame
 	end
 
 	local function UpdateNotification(self, elapsed)
 		local a, b, c, x, y = self:GetPoint()
-		self:SetPoint(a, b, c, x, .1+y)
+		self:SetPoint(a, b, c, x, 1+y)
 	end
 
 	local function ResetNotification(self)
-		self:SetPoint('BOTTOM', UIParent, 'CENTER', 0, self.offset)
+		self:SetPoint('CENTER', UIParent, 'CENTER', 0, self.offset)
 	end
 
 	local function CreateNotification(offset)
 		local frame = Frame(nil, C)
-			frame:SetSize(1,1)
+			frame:SetSize(1, 1)
+			frame:SetFrameLevel(11)
 			frame.offset = offset
 			frame.text = String(frame, 'CENTER', frame, 'CENTER', 0, 0, cfg.spellname_font, 16, cfg.spellname_fontFlag)
 			frame.FADE = CreateAni_FADE(frame)
-			frame:SetScript('OnUpdate', UpdateNotification)
-			frame:SetScript('OnShow', ResetNotification)
 			frame:Hide()
+			frame:SetScript('OnShow', ResetNotification)
+			frame:SetScript('OnHide', CheckDisplayCache)
+			frame:SetScript('OnUpdate', UpdateNotification)
 		return frame
 	end
 
-	--[[
-	local function CreateScroll(frame, i)
-		local line = 'line'..i
-		frame[line] = Frame(nil, C, 'CENTER', UIParent, 'CENTER', 0, 0, 16, 16)
-		frame[line]:SetAlpha(0)
-		frame[line].icon = Icon(frame[line], 16, 'ARTWORK')
-		frame[line].shadow = DropShadow(frame[line])
-		frame[line].amount = String(frame[line], 'TOP', frame[line], 'BOTTOM', 0, 0, cfg.font, cfg.fontSize-4, cfg.fontFlag, 0, 0)
-		frame[line].UP = CreateAni_V(frame[line])
-		frame[line]:Hide()
+	CombatEvent.EVENT_FRAME['notification'] = CreateNotification(140)
+	CombatEvent.EVENT_FRAME['notification'].cache = CombatEvent.EVENT_CACHE['notification']
+	CombatEvent.EVENT_FRAME['player'] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 0, -11, 1, 1)
+	CombatEvent.EVENT_FRAME['player'].cache = CombatEvent.EVENT_CACHE['player']
+	CombatEvent.EVENT_FRAME['playersub'] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 12, -62, 1, .8)
+	CombatEvent.EVENT_FRAME['playersub'].cache = CombatEvent.EVENT_CACHE['playersub']
+	CombatEvent.EVENT_FRAME['target'] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 0, -11, -1, 1)
+	CombatEvent.EVENT_FRAME['target'].cache = CombatEvent.EVENT_CACHE['target']
+	CombatEvent.EVENT_FRAME['targetsub'] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 12, -62, -1, .8)
+	CombatEvent.EVENT_FRAME['targetsub'].cache = CombatEvent.EVENT_CACHE['targetsub']
+	CombatEvent.EVENT_FRAME['focus'] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 0, -10, 1, .8)
+	CombatEvent.EVENT_FRAME['focus'].cache = CombatEvent.EVENT_CACHE['focus']
+	CombatEvent.EVENT_FRAME['focussub'] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 12, -56, 1, .8)
+	CombatEvent.EVENT_FRAME['focussub'].cache = CombatEvent.EVENT_CACHE['focussub']
+	CombatEvent.EVENT_FRAME['targettarget'] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', 0, -10, -1, .8)
+	CombatEvent.EVENT_FRAME['targettarget'].cache = CombatEvent.EVENT_CACHE['targettarget']
+	CombatEvent.EVENT_FRAME['targettargetsub'] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', 12, -56, -1, .8)
+	CombatEvent.EVENT_FRAME['targettargetsub'].cache = CombatEvent.EVENT_CACHE['targettargetsub']
+	CombatEvent.EVENT_FRAME['pet'] = CreateDisplay(C.UNITFRAME.Minor['pet'], 'LEFT', 'RIGHT', 0, -10, 1, .8)
+	CombatEvent.EVENT_FRAME['pet'].cache = CombatEvent.EVENT_CACHE['pet']
+	CombatEvent.EVENT_FRAME['petsub'] = CreateDisplay(C.UNITFRAME.Minor['pet'], 'LEFT', 'RIGHT', 12, -56, 1, .8)
+	CombatEvent.EVENT_FRAME['petsub'].cache = CombatEvent.EVENT_CACHE['petsub']
+
+	local function CheckScrollCache(self)
+		if #self.cache == 0 then return end
+		CombatEvent:DisplayScroll(self, unpack(self.cache[1]))
+		tremove(self.cache, 1)
+	end
+
+	local function CreateScroll(parent, align1, align2, x, y, factor)
+		local frame = Frame(nil, parent, align1, parent, align2, x*factor, y, 16, 16)
+			frame:Hide()
+			frame.icon = Icon(frame, 16, 'ARTWORK')
+			frame.shadow = DropShadow(frame)
+			frame.amount = String(frame, align2, frame, align1, -2*factor, 0, cfg.font, cfg.fontSize-4, cfg.fontFlag, 0, 0)
+			frame.text = String(frame, align1, frame, align2, 2*factor, 0, cfg.spellname_font, cfg.fontSize-4, cfg.fontFlag, 0, 0)
+			frame.UP = CreateAni_Scroll(frame)
+		return frame
 	end
 
 	for i = 1, 10 do
-		CreateScroll(PlayerEvent, i)
-		local line = 'line'..i
-		PlayerEvent[line]:ClearAllPoints()
-		PlayerEvent[line]:SetPoint('RIGHT', UIParent, 'CENTER', -cfg.x-32, cfg.y)
-		PlayerEvent[line].amount:ClearAllPoints()
-		PlayerEvent[line].amount:SetPoint('RIGHT', PlayerEvent[line].icon, 'LEFT', -2, 0)
-		CreateScroll(TargetEvent, i)
-		TargetEvent[line]:ClearAllPoints()
-		TargetEvent[line]:SetPoint('LEFT', UIParent, 'CENTER', cfg.x+32, cfg.y)
-		TargetEvent[line].amount:ClearAllPoints()
-		TargetEvent[line].amount:SetPoint('LEFT', TargetEvent[line].icon, 'RIGHT', 2, 0)
+		CombatEvent.EVENT_FRAME['playerscroll'..i] = CreateScroll(C.UNITFRAME.Major['player'], 'RIGHT', 'LEFT', 10, -10, -1)
+		CombatEvent.EVENT_FRAME['playerscroll'..i].cache = CombatEvent.EVENT_CACHE['playerscroll']
+		CombatEvent.EVENT_FRAME['targetscroll'..i] = CreateScroll(C.UNITFRAME.Major['target'], 'LEFT', 'RIGHT', 10, -10, 1)
+		CombatEvent.EVENT_FRAME['targetscroll'..i].cache = CombatEvent.EVENT_CACHE['targetscroll']
 	end
-	]]
-	local CombatEvent = CreateFrame('Frame', 'CombatEvent', C)
-		CombatEvent:RegisterEvent('PLAYER_LOGIN')
-		CombatEvent:SetScript('OnEvent', function(self, event, ...) self[event](self, ...) end)
-		CombatEvent:Hide()
-		CombatEvent.EVENT_FRAMES = {}
-		for i = 1, 3 do
-			CombatEvent.EVENT_FRAMES['player'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 11*(i-1), -11, 1, 1)
-			CombatEvent.EVENT_FRAMES['playersub'..i] = CreateDisplay(C.UNITFRAME.Major['player'], 'LEFT', 'RIGHT', 11*(i-1)+10, -62, 1, .8)
-			CombatEvent.EVENT_FRAMES['target'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 11*(i-1), -11, -1, 1)
-			CombatEvent.EVENT_FRAMES['targetsub'..i] = CreateDisplay(C.UNITFRAME.Major['target'], 'RIGHT', 'LEFT', 11*(i-1)+10, -62, -1, .8)
-			CombatEvent.EVENT_FRAMES['focus'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', 11*(i-1), -10, 1, .8)
-			CombatEvent.EVENT_FRAMES['focussub'..i] = CreateDisplay(C.UNITFRAME.Minor['focus'], 'LEFT', 'RIGHT', -11*(i-1)+10, -56, 1, .8)
-			CombatEvent.EVENT_FRAMES['targettarget'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', 11*(i-1), -10, -1, .8)
-			CombatEvent.EVENT_FRAMES['targettargetsub'..i] = CreateDisplay(C.UNITFRAME.Minor['targettarget'], 'RIGHT', 'LEFT', -11*(i-1)+10, -56, -1, .8)
-			CombatEvent.EVENT_FRAMES['notification'..i] = CreateNotification(140-(10*i))
-		end
 
-	local GetSpellTexture = GetSpellTexture
+
+
 	local function GetSpellIcon(spellID)
 		return ('|T%s:0|t'):format(GetSpellTexture(spellID))
 	end
@@ -211,55 +255,16 @@ function D.LOAD.M:LoadCombatEvent()
 	end
 
 	function CombatEvent:AddNotice(r, g, b, text, ...)
-		--[[local current_frame, next_frame = nil, nil
-		for i = 1, 3 do
-			current_frame = self.EVENT_FRAMES['notification'..i]
-			if current_frame:IsShown() then
-				current_frame:SetFrameLevel(self:GetFrameLevel()-1)
-				current_frame:SetAlpha(self:GetAlpha()*.33)
-				if i ~= 3 then
-					next_frame = self.EVENT_FRAMES['notification'..(1+i)]
-				else
-					next_frame = self.EVENT_FRAMES['notification1']
-				end
-			else
-				break
-			end
-		end
-		frame = next_frame or current_frame]]
-		local frame = self:GetNextDisplay('notification')
-		frame:Hide()
-		frame['FADE']:Stop()
-		frame.text:SetText(text:format(...))
-		frame.text:SetTextColor(r, g, b)
-		frame:SetFrameLevel(11)
-		frame:SetAlpha(1)
-		frame['FADE']:Play()
-		frame:Show()
-	end
-	--[[
-	local GetSpellTexture = GetSpellTexture
-	local function DisplayScroll(line, icon, text, r, g, b)
-		if line.UP:IsPlaying() then return end
-		line.icon:SetTexture(icon)
-		line.amount:SetText(text)
-		line.amount:SetTextColor(r, g, b)
-		line.UP:Play()
-		line:Show()
+		CombatEvent.EVENT_FRAME['notification'].text:SetText(text:format(...))
+		CombatEvent.EVENT_FRAME['notification'].text:SetTextColor(r, g, b)
+		CombatEvent.EVENT_FRAME['notification']:Show()
+		CombatEvent.EVENT_FRAME['notification']['FADE']:Play()
 	end
 
-	function CombatEvent:AddScroll(frame, iconID, text, r, g, b)
-		frame = CombatEvent[frame]
-		for i = 1, 10 do
-			DisplayScroll(frame['line'..i], GetSpellTexture(iconID), text, r, g, b)
-		end
-	end
-	]]
-
-	function CombatEvent:GetNextDisplay(unit)
+	function CombatEvent:GetNextDisplay_(unit)
 		local frame, counter = nil, nil
 		for i = 1, 3 do
-			frame = self.EVENT_FRAMES[unit..i]
+			frame = self.EVENT_FRAME[unit..i]
 			counter = i
 			if not frame:IsShown() then
 				break
@@ -268,27 +273,70 @@ function D.LOAD.M:LoadCombatEvent()
 				frame:SetAlpha(.33)
 			end
 		end
-		return self.EVENT_FRAMES[unit..(counter==3 and 1 or counter)]
+		return self.EVENT_FRAME[unit..(counter==3 and 1 or counter)]
 	end
 
-	function CombatEvent:Display(unit, animation, iconID, spellname, amount, r, g, b)
-		if not unit then return end
-		local frame = self:GetNextDisplay(unit)
-		frame:Hide()
-		frame[animation]:Stop()
+	function CombatEvent:Display(frame, animation, iconID, spellname, amount, r, g, b)
 		frame.icon:SetTexture(GetSpellTexture(iconID))
 		frame.spellname:SetText(spellname)
 		frame.spellname:SetTextColor(r, g, b)
 		frame.amount:SetText(amount)
 		frame.amount:SetTextColor(r, g, b)
-		frame:SetFrameLevel(11)
-		frame:SetAlpha(1)
 		frame[animation]:Play()
 		frame:Show()
 	end
 
+	function CombatEvent:UpdateDisplay(frame)
+		if self.EVENT_FRAME[frame]:IsShown() then return end
+		CheckDisplayCache(self.EVENT_FRAME[frame])
+	end
+
+	function CombatEvent:DisplayScroll(frame, iconID, text, amount, r, g, b)
+		frame.icon:SetTexture(GetSpellTexture(iconID))
+		frame.amount:SetText(amount)
+		frame.amount:SetTextColor(r, g, b)
+		frame.text:SetText(text)
+		frame.text:SetTextColor(r, g, b)
+		frame.UP:Play()
+		frame:Show()
+	end
+
+	function CombatEvent:UpdateScroll(frame)
+		for i = 1, 10 do
+			if not self.EVENT_FRAME[frame..i]:IsShown() then
+				CheckScrollCache(self.EVENT_FRAME[frame..i])
+				break
+			end
+		end
+	end
+
+	function CombatEvent:ResetScroll(frame)
+		for i = 1, 10 do
+			self.EVENT_FRAME[frame..i]:Hide()
+			self.EVENT_FRAME[frame..i].UP:Stop()
+		end
+	end
+
+	local function CombatEvent_OnUpdate(self, elapsed)
+		self.elapsed = elapsed + (self.elapsed or 0)
+		if self.elapsed < .3 then return end
+		self.elapsed = nil
+		if not C.UNITFRAME.Major['target']:IsShown() then
+			wipe(self.EVENT_CACHE['targetscroll'])
+			self:ResetScroll('targetscroll')
+		end
+		self:UpdateScroll('playerscroll')
+		self:UpdateScroll('targetscroll')
+	end
+	CombatEvent:SetScript('OnUpdate', CombatEvent_OnUpdate)
+
+	local flags = bit.bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_GUARDIAN)
 	function CombatEvent:COMBAT_LOG_EVENT_UNFILTERED(timeStamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, ...)
-		if (sourceGUID ~= C.UNIT['player']) and (destGUID ~= C.UNIT['player']) then return end
+		if combatEvent == 'SPELL_AURA_APPLIED' and SOS[spellID] then
+			self:AddMessage(self.CHANNEL, '[%s] > %s', sourceName, GetSpellLink(spellID))
+			return
+		end
+		if sourceGUID ~= C.UNIT['player'] and sourceGUID ~= C.UNIT['pet'] and destGUID ~= C.UNIT['player'] and destGUID ~= C.UNIT['pet'] and sourceFlags1 ~= flags then return end
 		self.CLEU[combatEvent](self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, ...)
 	end
 
@@ -313,9 +361,6 @@ function D.LOAD.M:LoadCombatEvent()
 		end
 	end
 
-	local UnitName, GetSpellLink = UnitName, GetSpellLink
-	local ColoredName = C.FUNC.UNIT.ColoredName
-	local COMMON = D.CFG.COMBAT_EVENT['common'] or {}
 	function CombatEvent:UNIT_SPELLCAST_SUCCEEDED(unit, spellName, rank, line, spellID)
 		if not unit then return end
 		if not COMMON[spellID] then return end

@@ -6,7 +6,7 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	local DoNothing = D.API.dummy
 	local ColoredName = C.FUNC.UNIT.ColoredName
 	local GetSpellIcon = C.COMBATEVENT.GetSpellIcon
-	local GetSpellLink, PlaySoundFile, select = GetSpellLink, PlaySoundFile, select
+	local GetSpellLink, PlaySoundFile, select, tinsert = GetSpellLink, PlaySoundFile, select, tinsert
 
 	local COLOR = setmetatable({
 		[0] = {r=.382,g=.382,b=.382},
@@ -59,12 +59,16 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	local function GetDisplayFrame(guid, major)
 		local unit = UNIT(guid)
 		if unit then
-			return unit..(major and '' or 'sub')
+			return ('%s%s'):format(unit, (major and '' or 'sub'))
 		end
 	end
 
 	local function AuraApplied(self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, auraType)
-		self:Display(GetDisplayFrame(destGUID, true), 'IN', spellID, spellName, nil, COLOR(spellSchool))
+		local frame = GetDisplayFrame(destGUID, false)
+		if frame then
+			tinsert(self.EVENT_CACHE[frame], {'IN', spellID, spellName, nil, COLOR(spellSchool)})
+			self:UpdateDisplay(frame)
+		end
 		if destGUID == UNIT['player'] then
 			if sourceGUID == UNIT['player'] then -- 自己上自己
 				if not SELF[spellID] then return end -- 過濾
@@ -87,7 +91,11 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	end
 
 	local function AuraRemoved(self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, auraType)
-		self:Display(GetDisplayFrame(destGUID), 'OUT', spellID, spellName, nil, COLOR(spellSchool))
+		local frame = GetDisplayFrame(destGUID, false)
+		if frame then
+			tinsert(self.EVENT_CACHE[frame], {'OUT', spellID, spellName, nil, COLOR(spellSchool)})
+			self:UpdateDisplay(frame)
+		end
 		if destGUID == UNIT['player'] then
 			if sourceGUID == UNIT['player'] then
 				if not SELF[spellID] then return end
@@ -110,17 +118,38 @@ function D.LOAD.E:LoadCombatEventCLEU()
 	end
 
 	local function Attacked(self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, amount, overKill, school, resisted, blocked, absorbed, critical)
-		if critical then
-			return self:Display(GetDisplayFrame(destGUID, true), 'IN', spellID, nil, amount, COLOR(school))
+		local frame = GetDisplayFrame(destGUID, true)
+		if not frame then return end
+		if not critical then
+			if self.EVENT_CACHE[frame..'scroll'] then
+				tinsert(self.EVENT_CACHE[frame..'scroll'], {spellID, spellName, amount, COLOR(school)})
+				--self:UpdateScroll(frame..'scroll')
+				return
+			end
+		else
+			tinsert(self.EVENT_CACHE[frame], {'IN', spellID, nil, amount, COLOR(school)})
+			self:UpdateDisplay(frame)
 		end
 	end
 
 	local function AttackMissed(self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, missType, isOffHand, amountMissed)
-		return self:Display(GetDisplayFrame(destGUID, true), 'OUT', spellID, nil, missType, COLOR(spellSchool))
+		local frame = GetDisplayFrame(destGUID, true)
+		if not frame then return end
+		tinsert(self.EVENT_CACHE[frame], {'OUT', spellID, nil, missType, COLOR(spellSchool)})
+		self:UpdateDisplay(frame)
 	end
 
 	local function Healed(self, sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, amount, overKill, school, resisted, blocked, absorbed, critical)
-		return self:Display(GetDisplayFrame(destGUID, true), 'IN', spellID, nil, amount, COLOR('HEAL'))
+		local frame = GetDisplayFrame(destGUID, true)
+		if not frame then return end
+		if self.EVENT_CACHE[frame..'scroll'] then
+			tinsert(self.EVENT_CACHE[frame..'scroll'], {spellID, spellName..' ['..ColoredName(sourceName)..']', amount, COLOR('HEAL')})
+			--self:UpdateScroll(frame..'scroll')
+			return
+		else
+			tinsert(self.EVENT_CACHE[frame], {'IN', spellID, nil, amount, COLOR('HEAL')})
+			self:UpdateDisplay(frame)
+		end
 	end
 
 	local CLEU = setmetatable({}, {__index = function() return DoNothing end})
@@ -141,19 +170,23 @@ function D.LOAD.E:LoadCombatEventCLEU()
 
 
 	function CLEU:SWING_DAMAGE(sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, amount, overKill, school, resisted, blocked, absorbed, critical, glancing, crushing)
-		return Attacked(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, _, 1, amount, overKill, school, resisted, blocked, absorbed, critical  or crushing)
+		return Attacked(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, nil, 1, amount, overKill, school, resisted, blocked, absorbed, critical  or crushing)
 	end
 
 	function CLEU:SWING_MISSED(sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, missType)
-		return AttackMissed(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, _, 1, missType)
+		return AttackMissed(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, nil, 1, missType)
 	end
 
 	function CLEU:ENVIRONMENTAL_DAMAGE(sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, environmentalType, amount, overKill, spellSchool, resisted, blocked, absorbed, critical)
-		return Attacked(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, _, 1, amount, _, _, _, _, _, 1)
+		return Attacked(self, sourceGUID, _, _, _, destGUID, _, _, _, 46917, nil, 1, amount, _, _, _, _, _, 1)
 	end
 
 	function CLEU:SPELL_INTERRUPT(sourceGUID, sourceName, sourceFlags1, sourceFlags2, destGUID, destName, destFlags1, destFlags2, spellID, spellName, spellSchool, extraSpellID, extraSpellName, extraSchool)
-		self:Display(GetDisplayFrame(destGUID, true), 'IN', spellID, nil, 'INTERRUPT', COLOR('INTERRUPT'))
+		local frame = GetDisplayFrame(destGUID, true)
+		if frame then
+			tinsert(self.EVENT_CACHE[frame], {'IN', spellID, nil, 'INTERRUPT', COLOR('INTERRUPT')})
+			self:UpdateDisplay(frame)
+		end
 		self:AddNotice(1, 1, 1, 'INTERRUPTED %s%s - %s[%s]', GetSpellIcon(extraSpellID), extraSpellName, GetRaidTargetIcon(destFlags2, true), ColoredName(destName))
 		if sourceGUID ~= UNIT['player'] then
 			return
