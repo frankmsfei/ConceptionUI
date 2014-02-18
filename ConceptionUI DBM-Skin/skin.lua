@@ -147,8 +147,8 @@ local function OnEvent()
 	DBT_SavedOptions['DBM'].IconRight = false
 	DBT_SavedOptions['DBM'].FillUpBars = false
 	DBT_SavedOptions['DBM'].TimerPoint = 'LEFT'
-	DBT_SavedOptions['DBM'].TimerX = 132
-	DBT_SavedOptions['DBM'].TimerY = 0
+	DBT_SavedOptions['DBM'].TimerX = 135
+	DBT_SavedOptions['DBM'].TimerY = -5
 	DBT_SavedOptions['DBM'].HugeTimerPoint = 'TOP'
 	DBT_SavedOptions['DBM'].HugeTimerX = 0
 	DBT_SavedOptions['DBM'].HugeTimerY = -140
@@ -169,6 +169,11 @@ local function OnEvent()
 	RaidWarningFrame.slot1:SetShadowOffset(0, 0)
 	RaidWarningFrame.slot2:SetFont(DAMAGE_TEXT_FONT, 20, 'THICKOUTLINE')
 	RaidWarningFrame.slot2:SetShadowOffset(0, 0)
+
+	RaidBossEmoteFrame.slot1:SetFont(DAMAGE_TEXT_FONT, 20, 'OUTLINE')
+	RaidBossEmoteFrame.slot1:SetShadowOffset(0, 0)
+	RaidBossEmoteFrame.slot2:SetFont(DAMAGE_TEXT_FONT, 20, 'OUTLINE')
+	RaidBossEmoteFrame.slot2:SetShadowOffset(0, 0)
 
 	local RaidNoticeAddMessage = RaidNotice_AddMessage
 	function RaidNotice_AddMessage(noticeFrame, textString, colorInfo, displayTime)
