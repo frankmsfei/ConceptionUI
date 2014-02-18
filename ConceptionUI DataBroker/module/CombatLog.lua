@@ -35,7 +35,7 @@ local function UpdateZone(self)
 	local status = nil
 	if IsInInstance() then
 		local AreaID = GetCurrentMapAreaID()
-		if AreaID == 953 or AreaID == 930 then
+		if AreaID == 953 or AreaID == 930 then -- 930 = TOT
 			status = 1
 		end
 	end
