@@ -14,8 +14,7 @@ local UnitIsPlayer, UnitIsBattlePet = UnitIsPlayer, UnitIsBattlePet
 local UnitIsDeadOrGhost, UnitIsAFK, UnitIsDND, UnitIsConnected = UnitIsDeadOrGhost, UnitIsAFK, UnitIsDND, UnitIsConnected
 local GetGuildInfo = GetGuildInfo
 local GetRaidTargetIndex = GetRaidTargetIndex
-local IsAltKeyDown = IsAltKeyDown -- debug
-local NotifyInspect = NotifyInspect -- inspect
+local NotifyInspect = NotifyInspect
 local GameTooltipText, GameTooltipHeaderText = GameTooltipText, GameTooltipHeaderText
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local FACTION_BAR_COLORS = FACTION_BAR_COLORS
@@ -26,6 +25,7 @@ local UNIT = ConceptionCORE.UNIT
 local PLAYER_NAME = UnitName('player')
 local REALM =  GetRealmName()
 
+local tinsert, pairs = tinsert, pairs
 local CACHE = setmetatable({},{
 	__call = function(self, value)
 		tinsert(self, value)
@@ -34,7 +34,8 @@ local CACHE = setmetatable({},{
 })
 
 local function HexColor(colorTable)
-	return ('|cFF%02x%02x%02x'):format(255*colorTable.r, 255*colorTable.g, 255*colorTable.b)
+	if not colorTable then return '|cFFFFFFFF' end
+	return ('|cFF%02X%02X%02X'):format(255*colorTable.r, 255*colorTable.g, 255*colorTable.b)
 end
 
 local function GetClass(unit)
@@ -78,9 +79,9 @@ local function UnitTarget(unit)
 	end
 end
 
-local function SetUnit(tip)
-	if IsAltKeyDown() then return end
+local function SetUnit(tip, unit)
 	local name, unit = tip:GetUnit()
+	unit = unit or tip:IsUnit('targettarget') and 'targettarget'
 	if not unit then return end
 	local class_color, class = GetClass(unit)
 	local level = UnitLevel(unit)
@@ -158,9 +159,8 @@ local function SetUnit(tip)
 				tip:AddLine(' ')
 				for key, text in pairs(CACHE) do
 					local name, progress, count = text:match('^ ([^ ]-) ?%- (.+)%p%s-(%d+/%d+)$') --local playerName, progress = strmatch(text, '^ ([^ ]-) ?%- (.+)$')
-					name = name == '' and PLAYER_NAME or name
 					local color = GetClass(name)
-					tip:AddDoubleLine(progress, ('|c%s%s|r - %s'):format(color, name, count or ''), .62, .62, .62, .62, .62, .62)
+					tip:AddDoubleLine(progress, ('|c%s%s|r %s'):format(color, name, count or ''), .62, .62, .62, .62, .62, .62)
 				end
 				wipe(CACHE)
 			end
