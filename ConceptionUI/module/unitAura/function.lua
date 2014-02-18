@@ -17,19 +17,10 @@ C.FUNC.AURA = {
 }
 
 local AURA = C.AURAFRAME
-local CACHE = setmetatable({}, {__mode='kv',
-	__call = function(self, key)
-		table.insert(self, key)--setmetatable(key, {__mode='kv'}))
-	end
-})
 
-local DEBUFF_COLOR = setmetatable({['Disease'] = {0, .618, .191}, ['Poison'] = {.618, .618, 0}, ['Magic'] = {0, .191, .618}, ['Curse'] = {.618, 0, .618}, ['None'] = {.618, 0, 0}}, {
-		__index = function(self) return self['None'] end,
-		__call = function(self, key) return self[key] end
-	})
+local DEBUFF_COLOR = setmetatable({['Disease'] = {0, .618, .191}, ['Poison'] = {.618, .618, 0}, ['Magic'] = {0, .191, .618}, ['Curse'] = {.618, 0, .618}, ['None'] = {.618, 0, 0}}, {__index = function(self) return self['None'] end, __call = function(self, key) return self[key] end})
 
-local function showAura(self, name, icon, stack, dispelType, expiration, desaturated, debuff, sort)
-	self.name = name
+local function showAura(self, icon, stack, dispelType, expiration, desaturated, debuff)
 	self.icon.overlay:Show()
 	self.icon:SetTexture(icon)
 	self.icon:SetDesaturated(desaturated)
@@ -43,49 +34,25 @@ local function showAura(self, name, icon, stack, dispelType, expiration, desatur
 	--self.timer:SetText(nil)
 end
 
-local function hideAura(self, sort)
+local function hideAura(self)
 	if not self.icon:GetTexture() then return end
 	self.icon.overlay:Hide()
 	self.shadow:Hide()
-	self.name = nil
 	self.expiration = nil
 	self.icon:SetTexture(nil)
 	self.stack:SetText(nil)
 	self.timer:SetText(nil)
 end
 
-local function sortbuff(a, b)
-	if a.expiration == 0 and b.expiration > 0 then
-		return true
-	elseif a.expiration > 0 and b.expiration == 0 then
-		return false
-	else
-		return a.expiration > b.expiration
-	end
-end
-
 local UnitAura = UnitAura
-local UpdateAura = function(auras, unit, filter, debuff, sort)
-	if sort then wipe(CACHE) end
+local UpdateAura = function(auras, unit, filter, debuff)
 	for i = 1, #auras do
-		local name, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
+		local _, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, i, filter)
 		if icon then
-			if sort then
-				CACHE({['id'] = i, ['expiration'] = expiration})
-			else
-				showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
-			end
+			showAura(auras[i], icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
 		else
 			hideAura(auras[i])
 		end
-	end
-	if sort then
-		table.sort(CACHE, sortbuff)
-		for i = 1, #CACHE do
-			local name, _, icon, stack, dispelType, _, expiration, caster, _, _, _, _, _, player = UnitAura(unit, CACHE[i].id, filter)
-			showAura(auras[i], name, icon, stack, dispelType, expiration, (caster ~= 'player') and player, debuff)
-		end
-		wipe(CACHE)
 	end
 end
 
@@ -146,9 +113,9 @@ end
 
 local GetTime, pairs = GetTime, pairs
 local function OnUpdate(self, elapsed)
-	--self.elapsed = elapsed + (self.elapsed or 0)
-	--if self.elapsed < .1 then return end
-	--self.elapsed = 0
+	self.elapsed = elapsed + (self.elapsed or 0)
+	if self.elapsed < .1 then return end
+	self.elapsed = 0
 	local now = GetTime()
 	for _, v in pairs(AURA) do
 		UpdateTimer(v, now)
