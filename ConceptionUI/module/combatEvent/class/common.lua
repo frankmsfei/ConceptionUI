@@ -4,6 +4,8 @@ function D.LOAD.I:LoadCombatEventCFG()
 	
 		--ex:[玩家] > [技能]
 		CFG['common'] = {
+		-- Damn Portal
+			[120146] = true, -- Ancient Portal: Dalaran
 		-- RAID
 			[29893]  = true, -- Soulwell
 			[43987]  = true, -- Conjure Refreshment Table
@@ -17,8 +19,9 @@ function D.LOAD.I:LoadCombatEventCFG()
 			[67826]  = true, -- Jeeves
 			[54710]  = true, -- MOLL-E
 			[54735]  = true, -- Electromagnetic Pulse
-			[94794]  = true, -- Rocket Fuel Leak
+			[84348]  = true, -- nvisibility Field
 		-- Toys
+			[49844]  = true, -- Direbrew's Remote
 			[61031]  = true, -- Toy Train Set
 			[62949]  = true, -- Wind-Up Train Wrecker
 			[133371] = true, -- Stackable Stag
@@ -31,6 +34,9 @@ function D.LOAD.I:LoadCombatEventCFG()
 			[131493] = true, -- B. F. F. Necklace
 			[129023] = true, -- Krastinov's Bag of Horrors
 			[128328] = true, -- Ken-Ken's Mask
+			[127800] = true, -- Turnip Punching Bag
+			[130505] = true, -- Anatomical Dummy
+			[147412] = true, -- Elixir of Wandering Spirits
 		-- Banquets
 			[104958] = true, -- Pandaren Banquet
 			[105193] = true, -- Great Pandaren Banquet
@@ -53,4 +59,9 @@ function D.LOAD.I:LoadCombatEventCFG()
 			[145196] = true, -- Pandaren Treasure Noodle Cart Kit
 		}
 
+
+		CFG['sos'] = {
+			[82855]  = true, -- Dazzling
+			[94794]  = true, -- Rocket Fuel Leak
+		}
 end
