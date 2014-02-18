@@ -1,5 +1,5 @@
 local mainBar = CreateFrame('Frame', nil, ConceptionCORE, 'SecureHandlerStateTemplate')
-	mainBar:SetPoint('TOP', UIParent, 'CENTER', 0, -210)
+	mainBar:SetPoint('BOTTOM', UIParent, 'CENTER', 0, -270)
 	mainBar:SetSize(26*6+5*6, 26*2+6)
 
 	for i = 1, 12 do
