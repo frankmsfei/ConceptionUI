@@ -31,6 +31,7 @@ function D.LOAD.M:LoadCombatEventClassCFG()
 			[82327]  = true,	-- 神聖光輝
 			[86659]  = true,	-- 遠古諸王守護者(防護)
 			[31821]  = true,	-- 虔誠光環
+			[114039] = true,  -- 純淨聖禦
 			[132403] = false,	-- 盾擊buff
 		}
 	
