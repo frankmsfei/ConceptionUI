@@ -7,7 +7,7 @@ local function GradientColor(percent)
 end
 
 local function UpdateDurability()
-	local total_cur, total_max, dangerous = 0, 0, nil
+	local dur, total_cur, total_max, dangerous = 0, 0, 0, nil
 	for i = 1, 19 do
 		local cur, max = GetInventoryItemDurability(i)
 		if cur then
@@ -18,7 +18,11 @@ local function UpdateDurability()
 			dangerous = true
 		end
 	end
-	local dur = 100*total_cur/total_max
+	if total_max == 0 then
+		dur = 100
+	elseif total_cur ~= 0 then
+		dur = 100*total_cur/total_max
+	end
 	if not dangerous then
 		dur = ('|cFF%02X%02X%02X%.1f|cFF616161%%|r'):format(GradientColor(dur))
 	else
