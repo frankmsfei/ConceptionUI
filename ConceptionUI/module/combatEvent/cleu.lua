@@ -143,7 +143,7 @@ function D.LOAD.E:LoadCombatEventCLEU()
 		local frame = GetDisplayFrame(destGUID, true)
 		if not frame then return end
 		if self.EVENT_CACHE[frame..'scroll'] then
-			tinsert(self.EVENT_CACHE[frame..'scroll'], {spellID, spellName..' ['..ColoredName(sourceName)..']', amount, COLOR('HEAL')})
+			tinsert(self.EVENT_CACHE[frame..'scroll'], {spellID, sourceName and ('%s%s'):format(ColoredName(sourceName), spellName) or spellName, amount, COLOR('HEAL')})
 			--self:UpdateScroll(frame..'scroll')
 			return
 		else
