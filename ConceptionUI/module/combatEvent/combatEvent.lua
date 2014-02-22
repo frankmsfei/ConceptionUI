@@ -212,7 +212,7 @@ function D.LOAD.M:LoadCombatEvent()
 	end
 
 	local function CreateScroll(parent, align1, align2, x, y, factor)
-		local frame = Frame(nil, parent, align1, parent, align2, x*factor, y, 16, 16)
+		local frame = Frame(nil, parent, align1, parent, align2, x, y, 16, 16)
 			frame:Hide()
 			frame.icon = Icon(frame, 16, 'ARTWORK')
 			frame.shadow = DropShadow(frame)
@@ -223,7 +223,7 @@ function D.LOAD.M:LoadCombatEvent()
 	end
 
 	for i = 1, 10 do
-		CombatEvent.EVENT_FRAME['playerscroll'..i] = CreateScroll(C.UNITFRAME.Major['player'], 'RIGHT', 'LEFT', 10, -10, -1)
+		CombatEvent.EVENT_FRAME['playerscroll'..i] = CreateScroll(C.UNITFRAME.Major['player'], 'RIGHT', 'LEFT', -10, -10, -1)
 		CombatEvent.EVENT_FRAME['playerscroll'..i].cache = CombatEvent.EVENT_CACHE['playerscroll']
 		CombatEvent.EVENT_FRAME['targetscroll'..i] = CreateScroll(C.UNITFRAME.Major['target'], 'LEFT', 'RIGHT', 10, -10, 1)
 		CombatEvent.EVENT_FRAME['targetscroll'..i].cache = CombatEvent.EVENT_CACHE['targetscroll']
