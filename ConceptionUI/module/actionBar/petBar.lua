@@ -13,3 +13,4 @@ local petBar = CreateFrame('Frame', nil, ConceptionCORE)
 	end
 
 PetActionBarFrame:SetParent(petBar)
+PetActionBarFrame:SetScale(.8)--it's right?
